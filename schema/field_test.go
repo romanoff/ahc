@@ -77,4 +77,21 @@ func TestObjectFieldValidate(t *testing.T) {
 	if err == nil {
 		t.Errorf("Expected to get object validation error (int supplied), but got nil")
 	}
+	field.ObjectFields = []*Field{&Field{Name: "numbers", Type: IntField}}
+	err = field.Validate(params)
+	if err == nil {
+		t.Errorf("Expected to get object validation error (wrong key supplied), but got nil")
+	}
+	field.ObjectFields = []*Field{
+		&Field{Name: "number", Type: IntField},
+		&Field{Name: "object", Type: ObjectField,
+			ObjectFields: []*Field{
+				&Field{Name: "key", Type: StringField},
+			},
+		},
+	}
+	err = field.Validate(params)
+	if err != nil {
+		t.Errorf("Expected to get no object validation error, but got %v", err)
+	}
 }

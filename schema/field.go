@@ -33,7 +33,7 @@ func (self *Field) Validate(value interface{}) error {
 		}
 	case IntField:
 		kind := reflect.TypeOf(value).Kind()
-		if kind != reflect.Int && kind != reflect.Int64 {
+		if kind != reflect.Int && kind != reflect.Int64 && kind != reflect.Float64 {
 			return errors.New(fmt.Sprintf("Expected int value, but got %v", value))
 		}
 	case BoolField:
@@ -61,6 +61,23 @@ func (self *Field) Validate(value interface{}) error {
 		kind := reflect.TypeOf(value).Kind()
 		if kind != reflect.Map {
 			return errors.New(fmt.Sprintf("Expected object value, but got %v", value))
+		}
+		if self.ObjectFields == nil {
+			return nil
+		}
+		valueMap, success := value.(map[string]interface{})
+		if !success {
+			return errors.New(fmt.Sprintf("Expected object value, but got %v", value))
+		}
+		for _, objectField := range self.ObjectFields {
+			objectFieldValue := valueMap[objectField.Name]
+			if objectFieldValue == nil {
+				return errors.New(objectField.Name + " key is missing")
+			}
+			err := objectField.Validate(objectFieldValue)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil
