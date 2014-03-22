@@ -8,7 +8,7 @@ import (
 
 const (
 	StringField = iota
-	IntField    = iota
+	NumField    = iota
 	BoolField   = iota
 	ArrayField  = iota
 	ObjectField = iota
@@ -31,7 +31,7 @@ func (self *Field) Validate(value interface{}) error {
 		if !success {
 			return errors.New(fmt.Sprintf("Expected string value, but got %v", value))
 		}
-	case IntField:
+	case NumField:
 		kind := reflect.TypeOf(value).Kind()
 		if kind != reflect.Int && kind != reflect.Int64 && kind != reflect.Float64 {
 			return errors.New(fmt.Sprintf("Expected int value, but got %v", value))

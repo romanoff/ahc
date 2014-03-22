@@ -17,8 +17,8 @@ func TestStringFieldValidate(t *testing.T) {
 	}
 }
 
-func TestIntFieldValidate(t *testing.T) {
-	field := &Field{Type: IntField}
+func TestNumFieldValidate(t *testing.T) {
+	field := &Field{Type: NumField}
 	err := field.Validate(1)
 	if err != nil {
 		t.Errorf("Expected to get no int validation error, but got %v", err)
@@ -51,7 +51,7 @@ func TestArrayFieldValidate(t *testing.T) {
 	if err == nil {
 		t.Errorf("Expected to get array validation error (string supplied), but got nil")
 	}
-	field.ArrayValues = &Field{Type: IntField}
+	field.ArrayValues = &Field{Type: NumField}
 	err = field.Validate([]int{1, 2, 3})
 	if err != nil {
 		t.Errorf("Expected to get no array validation error, but got %v", err)
@@ -77,13 +77,13 @@ func TestObjectFieldValidate(t *testing.T) {
 	if err == nil {
 		t.Errorf("Expected to get object validation error (int supplied), but got nil")
 	}
-	field.ObjectFields = []*Field{&Field{Name: "numbers", Type: IntField}}
+	field.ObjectFields = []*Field{&Field{Name: "numbers", Type: NumField}}
 	err = field.Validate(params)
 	if err == nil {
 		t.Errorf("Expected to get object validation error (wrong key supplied), but got nil")
 	}
 	field.ObjectFields = []*Field{
-		&Field{Name: "number", Type: IntField},
+		&Field{Name: "number", Type: NumField},
 		&Field{Name: "object", Type: ObjectField,
 			ObjectFields: []*Field{
 				&Field{Name: "key", Type: StringField},
