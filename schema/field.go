@@ -20,6 +20,8 @@ type Field struct {
 	Type          int
 	Required      bool
 	AllowedValues []string
+	ObjectFields  []*Field //Fields that are supposed to be in object (optional)
+	ArrayValues   *Field   //Field that ArrayField should consist of (optional)
 }
 
 func (self *Field) Validate(value interface{}) error {
@@ -30,8 +32,8 @@ func (self *Field) Validate(value interface{}) error {
 			return errors.New(fmt.Sprintf("Expected string value, but got %v", value))
 		}
 	case IntField:
-		_, success := value.(int)
-		if !success {
+		kind := reflect.TypeOf(value).Kind()
+		if kind != reflect.Int && kind != reflect.Int64 {
 			return errors.New(fmt.Sprintf("Expected int value, but got %v", value))
 		}
 	case BoolField:
@@ -43,6 +45,17 @@ func (self *Field) Validate(value interface{}) error {
 		kind := reflect.TypeOf(value).Kind()
 		if kind != reflect.Array && kind != reflect.Slice {
 			return errors.New(fmt.Sprintf("Expected array value, but got %v", value))
+		}
+		if self.ArrayValues == nil {
+			return nil
+		}
+		arrayValues := reflect.ValueOf(value)
+		for i := 0; i < arrayValues.Len(); i++ {
+			arrayValue := arrayValues.Index(i).Interface()
+			err := self.ArrayValues.Validate(arrayValue)
+			if err != nil {
+				return err
+			}
 		}
 	case ObjectField:
 		kind := reflect.TypeOf(value).Kind()

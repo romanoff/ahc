@@ -51,6 +51,15 @@ func TestArrayFieldValidate(t *testing.T) {
 	if err == nil {
 		t.Errorf("Expected to get array validation error (string supplied), but got nil")
 	}
+	field.ArrayValues = &Field{Type: IntField}
+	err = field.Validate([]int{1, 2, 3})
+	if err != nil {
+		t.Errorf("Expected to get no array validation error, but got %v", err)
+	}
+	err = field.Validate([]string{"a", "b", "c"})
+	if err == nil {
+		t.Errorf("Expected to get array validation error (string, but expected integer values), but got nil")
+	}
 }
 
 func TestObjectFieldValidate(t *testing.T) {
