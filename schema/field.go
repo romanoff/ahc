@@ -3,6 +3,7 @@ package schema
 import (
 	"errors"
 	"fmt"
+	"reflect"
 )
 
 const (
@@ -37,6 +38,11 @@ func (self *Field) Validate(value interface{}) error {
 		_, success := value.(bool)
 		if !success {
 			return errors.New(fmt.Sprintf("Expected bool value, but got %v", value))
+		}
+	case ArrayField:
+		kind := reflect.TypeOf(value).Kind()
+		if kind != reflect.Array && kind != reflect.Slice {
+			return errors.New(fmt.Sprintf("Expected array value, but got %v", value))
 		}
 	}
 	return nil

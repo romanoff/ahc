@@ -39,3 +39,15 @@ func TestBoolFieldValidate(t *testing.T) {
 		t.Errorf("Expected to get bool validation error (string supplied), but got nil")
 	}
 }
+
+func TestArrayFieldValidate(t *testing.T) {
+	field := &Field{Type: ArrayField}
+	err := field.Validate([]int{1, 2, 3})
+	if err != nil {
+		t.Errorf("Expected to get no array validation error, but got %v", err)
+	}
+	err = field.Validate("string field")
+	if err == nil {
+		t.Errorf("Expected to get array validation error (string supplied), but got nil")
+	}
+}
