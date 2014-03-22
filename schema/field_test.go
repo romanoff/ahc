@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"encoding/json"
 	"testing"
 )
 
@@ -49,5 +50,22 @@ func TestArrayFieldValidate(t *testing.T) {
 	err = field.Validate("string field")
 	if err == nil {
 		t.Errorf("Expected to get array validation error (string supplied), but got nil")
+	}
+}
+
+func TestObjectFieldValidate(t *testing.T) {
+	jsonString := `
+{"number": 5, "object": {"key": "value"}}
+`
+	var params map[string]interface{}
+	json.Unmarshal([]byte(jsonString), &params)
+	field := &Field{Type: ObjectField}
+	err := field.Validate(params["object"])
+	if err != nil {
+		t.Errorf("Expected to get no object validation error, but got %v", err)
+	}
+	err = field.Validate(params["number"])
+	if err == nil {
+		t.Errorf("Expected to get object validation error (int supplied), but got nil")
 	}
 }

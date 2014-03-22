@@ -44,6 +44,11 @@ func (self *Field) Validate(value interface{}) error {
 		if kind != reflect.Array && kind != reflect.Slice {
 			return errors.New(fmt.Sprintf("Expected array value, but got %v", value))
 		}
+	case ObjectField:
+		kind := reflect.TypeOf(value).Kind()
+		if kind != reflect.Map {
+			return errors.New(fmt.Sprintf("Expected object value, but got %v", value))
+		}
 	}
 	return nil
 }
