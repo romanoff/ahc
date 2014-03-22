@@ -22,9 +22,22 @@ type Field struct {
 }
 
 func (self *Field) Validate(value interface{}) error {
-	_, noError := value.(string)
-	if !noError {
-		return errors.New(fmt.Sprintf("Expected string value, but got %v", value))
+	switch self.Type {
+	case StringField:
+		_, success := value.(string)
+		if !success {
+			return errors.New(fmt.Sprintf("Expected string value, but got %v", value))
+		}
+	case IntField:
+		_, success := value.(int)
+		if !success {
+			return errors.New(fmt.Sprintf("Expected int value, but got %v", value))
+		}
+	case BoolField:
+		_, success := value.(bool)
+		if !success {
+			return errors.New(fmt.Sprintf("Expected bool value, but got %v", value))
+		}
 	}
 	return nil
 }
