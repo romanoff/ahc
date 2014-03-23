@@ -22,3 +22,20 @@ func TestSchemaValidation(t *testing.T) {
 		t.Errorf("Expected to get 1 schema validation errors,  but got %v", len(errors))
 	}
 }
+
+func TestGetSchemaParams(t *testing.T) {
+	params := make(map[string]interface{})
+	params["name"] = "John"
+	params["count"] = 5
+	schema := &Schema{Fields: []*Field{
+		&Field{Name: "name", Type: StringField},
+	}}
+	schemaParams := schema.GetSchemaParams(params)
+	if schemaParams["count"] != nil {
+		t.Errorf("Expected not to get count parameter as it's not specified in schema, but got %v", schemaParams["count"])
+	}
+	nameValue, _ := schemaParams["name"].(string)
+	if nameValue != "John" {
+		t.Errorf("Expected to get John as name parameter as it's specified in schema, but got %v", nameValue)
+	}
+}
