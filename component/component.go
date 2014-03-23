@@ -17,13 +17,14 @@ type Component struct {
 	Schema    *schema.Schema
 }
 
-// Renders component with data
+// Renders component with params
 func (self *Component) Render(params map[string]interface{}) ([]byte, error) {
 	out := bytes.Buffer{}
 	err := self.Template.Execute(&out, params)
 	return out.Bytes(), err
 }
 
+// Renders component with params and verifies params schema
 func (self *Component) RenderSafe(params map[string]interface{}) ([]byte, error) {
 	if self.Schema == nil {
 		return nil, errors.New(fmt.Sprintf("No schema provided for %v", self.Namespace))
