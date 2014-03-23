@@ -17,6 +17,19 @@ func TestStringFieldValidate(t *testing.T) {
 	}
 }
 
+func TestRequiredFieldValidate(t *testing.T) {
+	field := &Field{Type: StringField, Required: true}
+	err := field.Validate(nil)
+	if err == nil {
+		t.Errorf("Expected to get string validation error (nil supplied), but got nil")
+	}
+	field.Required = false
+	err = field.Validate(nil)
+	if err != nil {
+		t.Errorf("Expected to get no string validation error, but got %v", err)
+	}
+}
+
 func TestNumFieldValidate(t *testing.T) {
 	field := &Field{Type: NumField}
 	err := field.Validate(1)

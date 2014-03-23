@@ -25,6 +25,9 @@ type Field struct {
 }
 
 func (self *Field) Validate(value interface{}) error {
+	if value == nil && self.Required == false {
+		return nil
+	}
 	switch self.Type {
 	case StringField:
 		_, success := value.(string)
