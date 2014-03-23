@@ -30,6 +30,19 @@ func TestRequiredFieldValidate(t *testing.T) {
 	}
 }
 
+func TestAllowedValuesValidation(t *testing.T) {
+	field := &Field{Type: StringField, AllowedValues: []string{"a", "b"}}
+	err := field.Validate("c")
+	if err == nil {
+		t.Errorf("Expected to get string validation error (not allowed value), but got nil")
+	}
+	err = field.Validate("a")
+	if err != nil {
+		t.Errorf("Expected to get no string validation error, but got %v", err)
+	}
+
+}
+
 func TestNumFieldValidate(t *testing.T) {
 	field := &Field{Type: NumField}
 	err := field.Validate(1)

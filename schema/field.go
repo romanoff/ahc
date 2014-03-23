@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"strings"
 )
 
 const (
@@ -19,7 +20,7 @@ type Field struct {
 	Description   string
 	Type          int
 	Required      bool
-	AllowedValues []string
+	AllowedValues []string //For StringField only
 	ObjectFields  []*Field //Fields that are supposed to be in object (optional)
 	ArrayValues   *Field   //Field that ArrayField should consist of (optional)
 }
@@ -30,9 +31,13 @@ func (self *Field) Validate(value interface{}) error {
 	}
 	switch self.Type {
 	case StringField:
-		_, success := value.(string)
+		strVal, success := value.(string)
 		if !success {
 			return errors.New(fmt.Sprintf("Expected string value, but got %v", value))
+		}
+		if self.AllowedValues != nil && !StringInSlice(strVal, self.AllowedValues) {
+			return errors.New(fmt.Sprintf("Expected string value to be in (%v), but was %v",
+				strings.Join(self.AllowedValues, ", "), strVal))
 		}
 	case NumField:
 		kind := reflect.TypeOf(value).Kind()
