@@ -37,7 +37,5 @@ func (self *Component) RenderSafe(params map[string]interface{}) ([]byte, error)
 		return nil, errors.New(errorString)
 	}
 	filteredParams := self.Schema.GetSchemaParams(params)
-	out := bytes.Buffer{}
-	err := self.Template.Execute(&out, filteredParams)
-	return out.Bytes(), err
+	return self.Render(filteredParams)
 }
