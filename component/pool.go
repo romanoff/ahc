@@ -1,6 +1,9 @@
 package component
 
 import (
+	"errors"
+	"fmt"
+	"github.com/jteeuwen/go-pkg-xmlx"
 	"strings"
 )
 
@@ -26,5 +29,43 @@ func (self *Pool) GetComponent(namespace string) *Component {
 }
 
 func (self *Pool) Render(template []byte) ([]byte, error) {
-	return nil, nil
+	document := xmlx.New()
+	document.LoadBytes(template, nil)
+	html, err := self.getNodesHtml(document.Root.Children)
+	if err != nil {
+		return nil, err
+	}
+	return html, nil
+}
+
+func (self *Pool) getNodesHtml(nodes []*xmlx.Node) ([]byte, error) {
+	html := []byte{}
+	for _, node := range nodes {
+		if node.Type != xmlx.NT_ELEMENT {
+			continue
+		}
+		namespace := node.Name.Local
+		component := self.GetComponent(namespace)
+		if component == nil {
+			return nil, errors.New(fmt.Sprintf("Component missing: %v", namespace))
+		}
+		params, err := self.getComponentParams(component, node)
+		if err != nil {
+			return nil, errors.New(fmt.Sprintf("Error while parsing %v params: %v", namespace, err))
+		}
+		componentHtml, err := component.Render(params)
+		if err != nil {
+			return nil, errors.New(fmt.Sprintf("Error while rendering %v: %v", namespace, err))
+		}
+		html = append(html, componentHtml...)
+	}
+	return html, nil
+}
+
+func (self *Pool) getComponentParams(component *Component, node *xmlx.Node) (map[string]interface{}, error) {
+	params := make(map[string]interface{})
+	for _, attribute := range node.Attributes {
+		params[attribute.Name.Local] = attribute.Value
+	}
+	return params, nil
 }
