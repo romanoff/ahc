@@ -10,11 +10,12 @@ import (
 
 // Ahc component
 type Component struct {
-	Namespace string
-	Requires  []string
-	Css       string
-	Template  *template.Template
-	Schema    *schema.Schema
+	Namespace    string
+	Requires     []string
+	DefaultParam string
+	Css          string
+	Template     *template.Template
+	Schema       *schema.Schema
 }
 
 // Renders component with params

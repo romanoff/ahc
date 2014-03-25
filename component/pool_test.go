@@ -53,3 +53,21 @@ func TestPoolRenderUsingNamespaceParams(t *testing.T) {
 		t.Errorf("Expected to get:\n%v\n, but got:\n%v\n", expected, string(html))
 	}
 }
+
+func TestPoolRenderWithDefaultParams(t *testing.T) {
+	tmpl := template.Must(template.New("button").
+		Parse("<div class='button'>{{.name}}</div>"))
+	c := &Component{Namespace: "goog.button", Template: tmpl, DefaultParam: "name"}
+	pool := &Pool{Components: []*Component{c}}
+	ahcx := `
+<button>Click me</buton>
+`
+	html, err := pool.Render([]byte(ahcx))
+	if err != nil {
+		t.Errorf("Expected to get no error while rendering template, but got %v", err)
+	}
+	expected := "<div class='button'>Click me</div>"
+	if string(html) != expected {
+		t.Errorf("Expected to get:\n%v\n, but got:\n%v\n", expected, string(html))
+	}
+}
