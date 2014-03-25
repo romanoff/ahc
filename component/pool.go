@@ -41,6 +41,11 @@ func (self *Pool) Render(template []byte) ([]byte, error) {
 func (self *Pool) getNodesHtml(nodes []*xmlx.Node) ([]byte, error) {
 	html := []byte{}
 	for _, node := range nodes {
+		if node.Type == xmlx.NT_TEXT {
+			if strings.TrimSpace(node.Value) != "" {
+				html = append(html, []byte(node.Value)...)
+			}
+		}
 		if node.Type != xmlx.NT_ELEMENT {
 			continue
 		}
@@ -67,5 +72,23 @@ func (self *Pool) getComponentParams(component *Component, node *xmlx.Node) (map
 	for _, attribute := range node.Attributes {
 		params[attribute.Name.Local] = attribute.Value
 	}
+	if len(node.Children) > 0 && nodesHaveNamespace(node.Children, node.Name.Local) {
+		for _, child := range node.Children {
+			content, err := self.getNodesHtml(child.Children)
+			if err != nil {
+				return nil, err
+			}
+			params[child.Name.Local] = string(content)
+		}
+	}
 	return params, nil
+}
+
+func nodesHaveNamespace(nodes []*xmlx.Node, namespace string) bool {
+	for _, node := range nodes {
+		if node.Name.Space != namespace {
+			return false
+		}
+	}
+	return true
 }
