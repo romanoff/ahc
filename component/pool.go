@@ -80,6 +80,12 @@ func (self *Pool) getComponentParams(component *Component, node *xmlx.Node) (map
 			}
 			params[child.Name.Local] = string(content)
 		}
+	} else if component.DefaultParam != "" {
+		content, err := self.getNodesHtml(node.Children)
+		if err != nil {
+			return nil, err
+		}
+		params[component.DefaultParam] = string(content)
 	}
 	return params, nil
 }
