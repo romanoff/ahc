@@ -6,25 +6,25 @@ import (
 )
 
 func TestGetComponent(t *testing.T) {
-	button1 := &Component{Namespace: "mp.button"}
-	button2 := &Component{Namespace: "goog.button"}
+	button1 := &Component{Namespace: "mp.a-button"}
+	button2 := &Component{Namespace: "goog.a-button"}
 	pool := &Pool{Components: []*Component{button1, button2}}
-	if pool.GetComponent("button") != button1 {
-		t.Errorf("Expected to get mp.button from pool, but got %v", pool.GetComponent("button").Namespace)
+	if pool.GetComponent("a-button") != button1 {
+		t.Errorf("Expected to get mp.a-button from pool, but got %v", pool.GetComponent("a-button").Namespace)
 	}
-	if pool.GetComponent("goog.button") != button2 {
-		t.Errorf("Expected to get goog.button from pool, but got %v", pool.GetComponent("button").Namespace)
+	if pool.GetComponent("goog.a-button") != button2 {
+		t.Errorf("Expected to get goog.a-button from pool, but got %v", pool.GetComponent("a-button").Namespace)
 	}
 }
 
 func TestPoolRender(t *testing.T) {
 	tmpl := template.Must(template.New("button").
 		Parse("<div class='button'>{{.name}}</div>"))
-	c := &Component{Namespace: "goog.button", Template: tmpl}
+	c := &Component{Namespace: "goog.a-button", Template: tmpl}
 	pool := &Pool{Components: []*Component{c}}
 	ahcx := `
-<button name="Click me" />
-<button name="Click me!" />
+<a-button name="Click me" />
+<a-button name="Click me!" />
 `
 	html, err := pool.Render([]byte(ahcx))
 	if err != nil {
@@ -39,10 +39,10 @@ func TestPoolRender(t *testing.T) {
 func TestPoolRenderUsingNamespaceParams(t *testing.T) {
 	tmpl := template.Must(template.New("button").
 		Parse("<div class='button'>{{.name}}</div>"))
-	c := &Component{Namespace: "goog.button", Template: tmpl}
+	c := &Component{Namespace: "goog.a-button", Template: tmpl}
 	pool := &Pool{Components: []*Component{c}}
 	ahcx := `
-<button><button:name>Click me<button><button:name>Click me</button:name></buton></button:name></buton>
+<a-button><a-button:name>Click me<a-button><a-button:name>Click me</a-button:name></a-button></a-button:name></a-button>
 `
 	html, err := pool.Render([]byte(ahcx))
 	if err != nil {
@@ -57,10 +57,10 @@ func TestPoolRenderUsingNamespaceParams(t *testing.T) {
 func TestPoolRenderWithDefaultParams(t *testing.T) {
 	tmpl := template.Must(template.New("button").
 		Parse("<div class='button'>{{.name}}</div>"))
-	c := &Component{Namespace: "goog.button", Template: tmpl, DefaultParam: "name"}
+	c := &Component{Namespace: "goog.a-button", Template: tmpl, DefaultParam: "name"}
 	pool := &Pool{Components: []*Component{c}}
 	ahcx := `
-<button>Click me</buton>
+<a-button>Click me</a-button>
 `
 	html, err := pool.Render([]byte(ahcx))
 	if err != nil {

@@ -9,7 +9,7 @@ import (
 func TestComponentTemplate(t *testing.T) {
 	tmpl := template.Must(template.New("button").
 		Parse("<div class='button'>{{.name}}</div>"))
-	c := &Component{Namespace: "goog.button", Template: tmpl}
+	c := &Component{Namespace: "goog.a-button", Template: tmpl}
 	params := make(map[string]interface{})
 	params["name"] = "Click me"
 	html, err := c.Render(params)
@@ -23,9 +23,9 @@ func TestComponentTemplate(t *testing.T) {
 }
 
 func TestRenderSafeNoValidation(t *testing.T) {
-	tmpl := template.Must(template.New("button").
+	tmpl := template.Must(template.New("a-button").
 		Parse("<div class='button'>{{.name}}</div>"))
-	c := &Component{Namespace: "goog.button", Template: tmpl}
+	c := &Component{Namespace: "goog.a-button", Template: tmpl}
 	params := make(map[string]interface{})
 	params["name"] = "Click me"
 	_, err := c.RenderSafe(params)
@@ -38,7 +38,7 @@ func TestRenderSafeValidation(t *testing.T) {
 	tmpl := template.Must(template.New("button").
 		Parse("<div class='button'>{{.name}}</div>{{or .not_in_schema \"\"}}"))
 	c := &Component{
-		Namespace: "goog.button",
+		Namespace: "goog.a-button",
 		Template:  tmpl,
 		Schema: &schema.Schema{Fields: []*schema.Field{
 			&schema.Field{Name: "name", Required: true, Type: schema.StringField},
