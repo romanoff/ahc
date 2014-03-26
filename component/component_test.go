@@ -78,4 +78,17 @@ func TestComplexRender(t *testing.T) {
 	if expected != string(html) {
 		t.Errorf("Expected to get:\n%v\n, but got:\n%v", expected, string(html))
 	}
+
+	tmpl2 := template.Must(template.New("multibutton").
+		Parse("<div class='multibutton'><a-button name='one'/><a-button name='two'/></div><img src='image.png' />"))
+	multibutton.Template = tmpl2
+	html, err = multibutton.ComplexRender(params, pool)
+	if err != nil {
+		t.Errorf("Expected not to get error while rendering complex component, but got %v", err)
+	}
+	expected = `<div class="multibutton"><div class='button'>one</div><div class='button'>two</div></div><img src="image.png" />`
+	if expected != string(html) {
+		t.Errorf("Expected to get:\n%v\n, but got:\n%v", expected, string(html))
+	}
+
 }

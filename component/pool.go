@@ -38,6 +38,8 @@ func (self *Pool) Render(template []byte) ([]byte, error) {
 	return html, nil
 }
 
+var selfClosingTags string = "area,base,br,col,embed,hr,img,input,keygen,link,menuitem,meta param,source,track,wbr"
+
 func (self *Pool) getNodesHtml(nodes []*xmlx.Node) ([]byte, error) {
 	html := []byte{}
 	for _, node := range nodes {
@@ -60,10 +62,14 @@ func (self *Pool) getNodesHtml(nodes []*xmlx.Node) ([]byte, error) {
 			for _, attribute := range node.Attributes {
 				nodeAttributes += " " + attribute.Name.Local + "=\"" + attribute.Value + "\""
 			}
-			result := []byte("<" + namespace + nodeAttributes + ">")
-			result = append(result, childNodesHtml...)
-			result = append(result, []byte("</"+namespace+">")...)
-			return result, nil
+			if len(node.Children) == 0 && strings.Index(selfClosingTags, namespace) != -1 {
+				html = append(html, []byte("<"+namespace+nodeAttributes+" />")...)
+				continue
+			}
+			html = append(html, []byte("<"+namespace+nodeAttributes+">")...)
+			html = append(html, childNodesHtml...)
+			html = append(html, []byte("</"+namespace+">")...)
+			continue
 		}
 		component := self.GetComponent(namespace)
 		if component == nil {
