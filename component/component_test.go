@@ -60,3 +60,22 @@ func TestRenderSafeValidation(t *testing.T) {
 		t.Errorf("Expected to get:\n%v\n, but got:\n%v", expected, string(html))
 	}
 }
+
+func TestComplexRender(t *testing.T) {
+	tmpl := template.Must(template.New("button").
+		Parse("<div class='button'>{{.name}}</div>"))
+	tmpl1 := template.Must(template.New("multibutton").
+		Parse("<div class='multibutton'><a-button name='one'/><a-button name='two'/></div>"))
+	c := &Component{Namespace: "goog.a-button", Template: tmpl}
+	multibutton := &Component{Namespace: "goog.a-multibutton", Template: tmpl1}
+	pool := &Pool{Components: []*Component{c, multibutton}}
+	params := make(map[string]interface{})
+	html, err := multibutton.ComplexRender(params, pool)
+	if err != nil {
+		t.Errorf("Expected not to get error while rendering complex component, but got %v", err)
+	}
+	expected := `<div class="multibutton"><div class='button'>one</div><div class='button'>two</div></div>`
+	if expected != string(html) {
+		t.Errorf("Expected to get:\n%v\n, but got:\n%v", expected, string(html))
+	}
+}

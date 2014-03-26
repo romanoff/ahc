@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/jteeuwen/go-pkg-xmlx"
 	"github.com/romanoff/ahc/schema"
 	"text/template"
 )
@@ -40,4 +41,15 @@ func (self *Component) RenderSafe(params map[string]interface{}) ([]byte, error)
 	}
 	filteredParams := self.Schema.GetSchemaParams(params)
 	return self.Render(filteredParams)
+}
+
+func (self *Component) ComplexRender(params map[string]interface{}, pool *Pool) ([]byte, error) {
+	out := bytes.Buffer{}
+	err := self.Template.Execute(&out, params)
+	if err != nil {
+		return nil, err
+	}
+	document := xmlx.New()
+	document.LoadBytes(out.Bytes(), nil)
+	return pool.getNodesHtml(document.Root.Children)
 }

@@ -50,6 +50,21 @@ func (self *Pool) getNodesHtml(nodes []*xmlx.Node) ([]byte, error) {
 			continue
 		}
 		namespace := node.Name.Local
+		//If html node, not custom node
+		if strings.Index(namespace, "-") == -1 {
+			childNodesHtml, err := self.getNodesHtml(node.Children)
+			if err != nil {
+				return nil, err
+			}
+			nodeAttributes := ""
+			for _, attribute := range node.Attributes {
+				nodeAttributes += " " + attribute.Name.Local + "=\"" + attribute.Value + "\""
+			}
+			result := []byte("<" + namespace + nodeAttributes + ">")
+			result = append(result, childNodesHtml...)
+			result = append(result, []byte("</"+namespace+">")...)
+			return result, nil
+		}
 		component := self.GetComponent(namespace)
 		if component == nil {
 			return nil, errors.New(fmt.Sprintf("Component missing: %v", namespace))
