@@ -20,7 +20,7 @@ type Component struct {
 }
 
 // Renders component with params
-func (self *Component) Render(params map[string]interface{}) ([]byte, error) {
+func (self *Component) RenderSimple(params map[string]interface{}) ([]byte, error) {
 	out := bytes.Buffer{}
 	err := self.Template.Execute(&out, params)
 	return out.Bytes(), err
@@ -40,10 +40,10 @@ func (self *Component) RenderSafe(params map[string]interface{}) ([]byte, error)
 		return nil, errors.New(errorString)
 	}
 	filteredParams := self.Schema.GetSchemaParams(params)
-	return self.Render(filteredParams)
+	return self.RenderSimple(filteredParams)
 }
 
-func (self *Component) ComplexRender(params map[string]interface{}, pool *Pool) ([]byte, error) {
+func (self *Component) Render(params map[string]interface{}, pool *Pool) ([]byte, error) {
 	out := bytes.Buffer{}
 	err := self.Template.Execute(&out, params)
 	if err != nil {

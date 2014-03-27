@@ -30,7 +30,7 @@ func TestPoolRender(t *testing.T) {
 	if err != nil {
 		t.Errorf("Expected to get no error while rendering template, but got %v", err)
 	}
-	expected := "<div class='button'>Click me</div><div class='button'>Click me!</div>"
+	expected := `<div class="button">Click me</div><div class="button">Click me!</div>`
 	if string(html) != expected {
 		t.Errorf("Expected to get:\n%v\n, but got:\n%v\n", expected, string(html))
 	}
@@ -48,7 +48,7 @@ func TestPoolRenderUsingNamespaceParams(t *testing.T) {
 	if err != nil {
 		t.Errorf("Expected to get no error while rendering template, but got %v", err)
 	}
-	expected := "<div class='button'>Click me<div class='button'>Click me</div></div>"
+	expected := `<div class="button">Click me<div class="button">Click me</div></div>`
 	if string(html) != expected {
 		t.Errorf("Expected to get:\n%v\n, but got:\n%v\n", expected, string(html))
 	}
@@ -66,7 +66,7 @@ func TestPoolRenderWithDefaultParams(t *testing.T) {
 	if err != nil {
 		t.Errorf("Expected to get no error while rendering template, but got %v", err)
 	}
-	expected := "<div class='button'>Click me</div>"
+	expected := `<div class="button">Click me</div>`
 	if string(html) != expected {
 		t.Errorf("Expected to get:\n%v\n, but got:\n%v\n", expected, string(html))
 	}

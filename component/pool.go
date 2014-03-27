@@ -79,7 +79,7 @@ func (self *Pool) getNodesHtml(nodes []*xmlx.Node) ([]byte, error) {
 		if err != nil {
 			return nil, errors.New(fmt.Sprintf("Error while parsing %v params: %v", namespace, err))
 		}
-		componentHtml, err := component.Render(params)
+		componentHtml, err := component.Render(params, self)
 		if err != nil {
 			return nil, errors.New(fmt.Sprintf("Error while rendering %v: %v", namespace, err))
 		}

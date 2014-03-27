@@ -12,7 +12,7 @@ func TestComponentTemplate(t *testing.T) {
 	c := &Component{Namespace: "goog.a-button", Template: tmpl}
 	params := make(map[string]interface{})
 	params["name"] = "Click me"
-	html, err := c.Render(params)
+	html, err := c.RenderSimple(params)
 	if err != nil {
 		t.Errorf("Expected no error while rendering, but got %v", err)
 	}
@@ -61,7 +61,7 @@ func TestRenderSafeValidation(t *testing.T) {
 	}
 }
 
-func TestComplexRender(t *testing.T) {
+func TestRender(t *testing.T) {
 	tmpl := template.Must(template.New("button").
 		Parse("<div class='button'>{{.name}}</div>"))
 	tmpl1 := template.Must(template.New("multibutton").
@@ -70,11 +70,11 @@ func TestComplexRender(t *testing.T) {
 	multibutton := &Component{Namespace: "goog.a-multibutton", Template: tmpl1}
 	pool := &Pool{Components: []*Component{c, multibutton}}
 	params := make(map[string]interface{})
-	html, err := multibutton.ComplexRender(params, pool)
+	html, err := multibutton.Render(params, pool)
 	if err != nil {
 		t.Errorf("Expected not to get error while rendering complex component, but got %v", err)
 	}
-	expected := `<div class="multibutton"><div class='button'>one</div><div class='button'>two</div></div>`
+	expected := `<div class="multibutton"><div class="button">one</div><div class="button">two</div></div>`
 	if expected != string(html) {
 		t.Errorf("Expected to get:\n%v\n, but got:\n%v", expected, string(html))
 	}
@@ -82,11 +82,11 @@ func TestComplexRender(t *testing.T) {
 	tmpl2 := template.Must(template.New("multibutton").
 		Parse("<div class='multibutton'><a-button name='one'/><a-button name='two'/></div><img src='image.png' />"))
 	multibutton.Template = tmpl2
-	html, err = multibutton.ComplexRender(params, pool)
+	html, err = multibutton.Render(params, pool)
 	if err != nil {
 		t.Errorf("Expected not to get error while rendering complex component, but got %v", err)
 	}
-	expected = `<div class="multibutton"><div class='button'>one</div><div class='button'>two</div></div><img src="image.png" />`
+	expected = `<div class="multibutton"><div class="button">one</div><div class="button">two</div></div><img src="image.png" />`
 	if expected != string(html) {
 		t.Errorf("Expected to get:\n%v\n, but got:\n%v", expected, string(html))
 	}
