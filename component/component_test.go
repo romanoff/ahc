@@ -12,7 +12,7 @@ func TestComponentTemplate(t *testing.T) {
 	c := &Component{Namespace: "goog.a-button", Template: tmpl}
 	params := make(map[string]interface{})
 	params["name"] = "Click me"
-	html, err := c.RenderSimple(params)
+	html, err := c.Render(params, nil)
 	if err != nil {
 		t.Errorf("Expected no error while rendering, but got %v", err)
 	}

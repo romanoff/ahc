@@ -18,12 +18,19 @@ type Component struct {
 	Template     *template.Template
 	Schema       *schema.Schema
 }
-
 // Renders component with params
-func (self *Component) RenderSimple(params map[string]interface{}) ([]byte, error) {
+func (self *Component) Render(params map[string]interface{}, pool *Pool) ([]byte, error) {
 	out := bytes.Buffer{}
 	err := self.Template.Execute(&out, params)
-	return out.Bytes(), err
+	if err != nil {
+		return nil, err
+	}
+	if pool == nil {
+		return out.Bytes(), err
+	}
+	document := xmlx.New()
+	document.LoadBytes(out.Bytes(), nil)
+	return pool.getNodesHtml(document.Root.Children)
 }
 
 // Renders component with params and verifies params schema
@@ -40,16 +47,5 @@ func (self *Component) RenderSafe(params map[string]interface{}) ([]byte, error)
 		return nil, errors.New(errorString)
 	}
 	filteredParams := self.Schema.GetSchemaParams(params)
-	return self.RenderSimple(filteredParams)
-}
-
-func (self *Component) Render(params map[string]interface{}, pool *Pool) ([]byte, error) {
-	out := bytes.Buffer{}
-	err := self.Template.Execute(&out, params)
-	if err != nil {
-		return nil, err
-	}
-	document := xmlx.New()
-	document.LoadBytes(out.Bytes(), nil)
-	return pool.getNodesHtml(document.Root.Children)
+	return self.Render(filteredParams, nil)
 }
