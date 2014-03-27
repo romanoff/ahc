@@ -18,6 +18,7 @@ type Component struct {
 	Template     *template.Template
 	Schema       *schema.Schema
 }
+
 // Renders component with params
 func (self *Component) Render(params map[string]interface{}, pool *Pool) ([]byte, error) {
 	out := bytes.Buffer{}
@@ -34,7 +35,7 @@ func (self *Component) Render(params map[string]interface{}, pool *Pool) ([]byte
 }
 
 // Renders component with params and verifies params schema
-func (self *Component) RenderSafe(params map[string]interface{}) ([]byte, error) {
+func (self *Component) RenderSafe(params map[string]interface{}, pool *Pool) ([]byte, error) {
 	if self.Schema == nil {
 		return nil, errors.New(fmt.Sprintf("No schema provided for %v", self.Namespace))
 	}

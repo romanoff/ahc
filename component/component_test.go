@@ -28,7 +28,7 @@ func TestRenderSafeNoValidation(t *testing.T) {
 	c := &Component{Namespace: "goog.a-button", Template: tmpl}
 	params := make(map[string]interface{})
 	params["name"] = "Click me"
-	_, err := c.RenderSafe(params)
+	_, err := c.RenderSafe(params, nil)
 	if err == nil {
 		t.Errorf("Expected to get missing schema error for RenderSafe, but got nil")
 	}
@@ -45,13 +45,13 @@ func TestRenderSafeValidation(t *testing.T) {
 		}},
 	}
 	params := make(map[string]interface{})
-	_, err := c.RenderSafe(params)
+	_, err := c.RenderSafe(params, nil)
 	if err == nil {
 		t.Errorf("Expected to get missing schema parameter error for RenderSafe, but got nil")
 	}
 	params["name"] = "Click me"
 	params["not_in_schema"] = "This text should not appear in button"
-	html, err := c.RenderSafe(params)
+	html, err := c.RenderSafe(params, nil)
 	if err != nil {
 		t.Errorf("Expected no error while rendering, but got %v", err)
 	}
