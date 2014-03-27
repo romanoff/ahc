@@ -10,6 +10,7 @@ import (
 type Pool struct {
 	Components []*Component
 	Pools      []*Pool
+	Safe       bool // Specifies if each component parametes should be checked again schema
 }
 
 func (self *Pool) GetComponent(namespace string) *Component {
@@ -79,7 +80,12 @@ func (self *Pool) getNodesHtml(nodes []*xmlx.Node) ([]byte, error) {
 		if err != nil {
 			return nil, errors.New(fmt.Sprintf("Error while parsing %v params: %v", namespace, err))
 		}
-		componentHtml, err := component.Render(params, self)
+		var componentHtml []byte
+		if self.Safe {
+			componentHtml, err = component.RenderSafe(params, self)
+		} else {
+			componentHtml, err = component.Render(params, self)
+		}
 		if err != nil {
 			return nil, errors.New(fmt.Sprintf("Error while rendering %v: %v", namespace, err))
 		}

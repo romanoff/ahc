@@ -1,6 +1,7 @@
 package component
 
 import (
+	"github.com/romanoff/ahc/schema"
 	"testing"
 	"text/template"
 )
@@ -69,5 +70,25 @@ func TestPoolRenderWithDefaultParams(t *testing.T) {
 	expected := `<div class="button">Click me</div>`
 	if string(html) != expected {
 		t.Errorf("Expected to get:\n%v\n, but got:\n%v\n", expected, string(html))
+	}
+}
+
+func TestPoolRenderSafe(t *testing.T) {
+	tmpl := template.Must(template.New("button").
+		Parse("<div class='button'>{{.name}}</div>{{or .not_in_schema \"\"}}"))
+	c := &Component{
+		Namespace: "goog.a-button",
+		Template:  tmpl,
+		Schema: &schema.Schema{Fields: []*schema.Field{
+			&schema.Field{Name: "name", Required: true, Type: schema.StringField},
+		}},
+	}
+	pool := &Pool{Components: []*Component{c}, Safe: true}
+	ahcx := `
+<a-button></a-button>
+`
+	_, err := pool.Render([]byte(ahcx))
+	if err == nil {
+		t.Errorf("Expected error while rendering pool component with not enough params, but got nil")
 	}
 }
