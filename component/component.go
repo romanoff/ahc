@@ -53,5 +53,13 @@ func (self *Component) RenderSafe(params map[string]interface{}, pool *Pool) ([]
 }
 
 func (self *Component) CastParams(params map[string]interface{}) map[string]interface{} {
+	if self.Schema == nil {
+		return params
+	}
+	for _, field := range self.Schema.Fields {
+		if params[field.Name] != nil {
+			params[field.Name] = field.Cast(params[field.Name])
+		}
+	}
 	return params
 }

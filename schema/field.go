@@ -90,3 +90,14 @@ func (self *Field) Validate(value interface{}) error {
 	}
 	return nil
 }
+
+func (self *Field) Cast(value interface{}) interface{} {
+	switch self.Type {
+	case BoolField:
+		value, success := value.(string)
+		if success {
+			return value == "true" || value == "1"
+		}
+	}
+	return value
+}
