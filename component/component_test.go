@@ -92,3 +92,27 @@ func TestRender(t *testing.T) {
 	}
 
 }
+
+func TestCastParams(t *testing.T) {
+	tmpl := template.Must(template.New("button").
+		Parse("<div class='button' {{ if .hidden}}style='display: none;'{{end}}>{{.name}}</div>"))
+	c := &Component{
+		Namespace: "goog.a-button",
+		Template:  tmpl,
+		Schema: &schema.Schema{Fields: []*schema.Field{
+			&schema.Field{Name: "name", Required: true, Type: schema.StringField},
+			&schema.Field{Name: "hidden", Type: schema.BoolField},
+		}},
+	}
+	params := make(map[string]interface{})
+	params["name"] = "Here goes name"
+	params["hidden"] = "false"
+	html, err := c.Render(params, nil)
+	if err != nil {
+		t.Errorf("Expected not to get error while rendering button, but got %v", err)
+	}
+	expected := `<div class='button' >Here goes name</div>`
+	if expected != string(html) {
+		t.Errorf("Expected to get:\n%v\n, but got:\n%v", expected, string(html))
+	}
+}

@@ -21,6 +21,7 @@ type Component struct {
 
 // Renders component with params
 func (self *Component) Render(params map[string]interface{}, pool *Pool) ([]byte, error) {
+	params = self.CastParams(params)
 	out := bytes.Buffer{}
 	err := self.Template.Execute(&out, params)
 	if err != nil {

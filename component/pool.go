@@ -80,7 +80,6 @@ func (self *Pool) getNodesHtml(nodes []*xmlx.Node) ([]byte, error) {
 		if err != nil {
 			return nil, errors.New(fmt.Sprintf("Error while parsing %v params: %v", namespace, err))
 		}
-		params = component.CastParams(params)
 		var componentHtml []byte
 		if self.Safe {
 			componentHtml, err = component.RenderSafe(params, self)
