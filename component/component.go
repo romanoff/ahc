@@ -50,3 +50,7 @@ func (self *Component) RenderSafe(params map[string]interface{}, pool *Pool) ([]
 	filteredParams := self.Schema.GetSchemaParams(params)
 	return self.Render(filteredParams, nil)
 }
+
+func (self *Component) CastParams(params map[string]interface{}) map[string]interface{} {
+	return params
+}
