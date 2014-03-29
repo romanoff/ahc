@@ -121,3 +121,30 @@ func TestObjectFieldValidate(t *testing.T) {
 		t.Errorf("Expected to get no object validation error, but got %v", err)
 	}
 }
+
+var boolCastTests = []struct {
+	input  interface{}
+	result interface{}
+}{
+	{"true", true},
+	{"false", false},
+	{1, true},
+	{0, false},
+	{"1", true},
+	{"0", false},
+	{true, true},
+	{false, false},
+}
+
+func TestCastBoolean(t *testing.T) {
+	field := &Field{Type: BoolField}
+	for i, tt := range boolCastTests {
+		value, ok := field.Cast(tt.input).(bool)
+		if ok != true {
+			t.Errorf("%d. boolean cast from '%v' was unsuccessful", i, tt.input)
+		}
+		if value != tt.result {
+			t.Errorf("%d. boolean cast from '%v' to boolean is %v, but expected %v", i, tt.input, value, tt.result)
+		}
+	}
+}
