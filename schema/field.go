@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 )
 
@@ -101,6 +102,22 @@ func (self *Field) Cast(value interface{}) interface{} {
 		intValue, success := value.(int)
 		if success {
 			return intValue == 1
+		}
+	case NumField:
+		stringValue, success := value.(string)
+		if success {
+			floatValue, err := strconv.ParseFloat(stringValue, 32)
+			if err == nil {
+				return floatValue
+			}
+		}
+		intValue, success := value.(int)
+		if success {
+			return float64(intValue)
+		}
+		floatValue, success := value.(float32)
+		if success {
+			return float64(floatValue)
 		}
 	}
 	return value

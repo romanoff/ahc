@@ -2,6 +2,7 @@ package schema
 
 import (
 	"encoding/json"
+	"math"
 	"testing"
 )
 
@@ -145,6 +146,30 @@ func TestCastBoolean(t *testing.T) {
 		}
 		if value != tt.result {
 			t.Errorf("%d. boolean cast from '%v' to boolean is %v, but expected %v", i, tt.input, value, tt.result)
+		}
+	}
+}
+
+var numCastTests = []struct {
+	input  interface{}
+	result float64
+}{
+	{"2", 2},
+	{"2.2", 2.2},
+	{2, 2},
+	{float32(2), 2},
+}
+
+func TestCastNumber(t *testing.T) {
+	field := &Field{Type: NumField}
+	eps := 1e-6
+	for i, tt := range numCastTests {
+		value, ok := field.Cast(tt.input).(float64)
+		if ok != true {
+			t.Errorf("%d. number cast from '%v' was unsuccessful", i, tt.input)
+		}
+		if !(math.Abs(value-tt.result) < eps) {
+			t.Errorf("%d. number cast from '%v' to number is %v, but expected %v", i, tt.input, value, tt.result)
 		}
 	}
 }
