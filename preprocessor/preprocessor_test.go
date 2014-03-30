@@ -10,7 +10,7 @@ import (
 )
 
 func TestCss(t *testing.T) {
-	css := &Css{}
+	css := Init()
 	filepath.Walk("tests", func(filepath string, f os.FileInfo, err error) error {
 		if !f.IsDir() && path.Ext(filepath) == ".acss" {
 			css.Content, _ = ioutil.ReadFile(filepath)
