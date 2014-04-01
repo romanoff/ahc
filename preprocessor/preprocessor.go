@@ -16,3 +16,8 @@ func (self *Css) Get() ([]byte, error) {
 	}
 	return self.Content, nil
 }
+
+// Return css classes
+func (self *Css) Classes() ([]string, error) {
+	return []string{}, nil
+}
