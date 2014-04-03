@@ -26,3 +26,15 @@ func TestCss(t *testing.T) {
 		return nil
 	})
 }
+
+func TestClasses(t *testing.T) {
+	css := Init()
+	css.Content = []byte(`.a .b {}`)
+	classes, err := css.Classes()
+	if err != nil {
+		t.Errorf("Expected to get no error while getting classes, but got %v", err)
+	}
+	if len(classes) != 2 {
+		t.Errorf("Expected to get 2 classes, but got %v", len(classes))
+	}
+}
