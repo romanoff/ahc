@@ -1,5 +1,10 @@
 package preprocessor
 
+import (
+	"regexp"
+	"fmt"
+)
+
 func Init() *Css {
 	return &Css{Variables: make(map[string][]byte)}
 }
@@ -18,6 +23,14 @@ func (self *Css) Get() ([]byte, error) {
 }
 
 // Return css classes
+var selectorRe = regexp.MustCompile("(?s)(.*)\\s*{(.*?)}")
 func (self *Css) Classes() ([]string, error) {
+	matches := selectorRe.FindAllSubmatch(self.Content, -1)
+	fmt.Println(len(matches))
+	for _, match := range matches {
+		fmt.Println("--------")
+		fmt.Println(string(match[1]))
+		fmt.Println("--------*")
+	}
 	return []string{}, nil
 }

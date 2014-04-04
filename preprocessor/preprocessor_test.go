@@ -29,7 +29,11 @@ func TestCss(t *testing.T) {
 
 func TestClasses(t *testing.T) {
 	css := Init()
-	css.Content = []byte(`.a .b {}`)
+	css.Content = []byte(`.a {
+}
+
+.b {
+}`)
 	classes, err := css.Classes()
 	if err != nil {
 		t.Errorf("Expected to get no error while getting classes, but got %v", err)
