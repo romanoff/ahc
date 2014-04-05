@@ -2,7 +2,6 @@ package preprocessor
 
 import (
 	"regexp"
-	"fmt"
 )
 
 func Init() *Css {
@@ -23,14 +22,21 @@ func (self *Css) Get() ([]byte, error) {
 }
 
 // Return css classes
-var selectorRe = regexp.MustCompile("(?s)(.*)\\s*{(.*?)}")
+var selectorRe = regexp.MustCompile("(?s)([^{]*)\\s*{(.*?)}")
+var classRe = regexp.MustCompile("\\.(\\w+)")
+
 func (self *Css) Classes() ([]string, error) {
 	matches := selectorRe.FindAllSubmatch(self.Content, -1)
-	fmt.Println(len(matches))
+	classes := []string{}
 	for _, match := range matches {
-		fmt.Println("--------")
-		fmt.Println(string(match[1]))
-		fmt.Println("--------*")
+		if len(match) == 3 {
+			classesMatch := classRe.FindAllSubmatch(match[1], -1)
+			for _, classMatch := range classesMatch {
+				if len(classMatch) == 2 {
+					classes = append(classes, string(classMatch[1]))
+				}
+			}
+		}
 	}
-	return []string{}, nil
+	return classes, nil
 }
