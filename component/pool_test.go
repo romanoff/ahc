@@ -92,3 +92,25 @@ func TestPoolRenderSafe(t *testing.T) {
 		t.Errorf("Expected error while rendering pool component with not enough params, but got nil")
 	}
 }
+
+func TestPoolRenderContainerWithDefaultParams(t *testing.T) {
+	tmpl := template.Must(template.New("button").
+		Parse("<div class='button'>{{.name}}</div>"))
+	c := &Component{Namespace: "goog.a-button", Template: tmpl}
+	containerTmpl := template.Must(template.New("container").
+		Parse("<div class='container'>{{.content}}</div>"))
+	c1 := &Component{Namespace: "goog.a-container", Template: containerTmpl, DefaultParam: "content"}
+	pool := &Pool{Components: []*Component{c, c1}}
+	ahcx := `
+<a-container><a-button name="Click me"/></a-container>
+`
+
+	html, err := pool.Render([]byte(ahcx))
+	if err != nil {
+		t.Errorf("Expected to get no error while rendering template, but got %v", err)
+	}
+	expected := `<div class="container"><div class="button">Click me</div></div>`
+	if string(html) != expected {
+		t.Errorf("Expected to get:\n%v\n, but got:\n%v\n", expected, string(html))
+	}
+}
