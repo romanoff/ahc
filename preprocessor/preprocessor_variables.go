@@ -27,7 +27,10 @@ var varRe *regexp.Regexp = regexp.MustCompile("\\$([\\w-]+)")
 func (self *Css) processLineWithVariable(line []byte) ([]byte, error) {
 	match := setVarRe.FindSubmatch(line)
 	if len(match) == 3 {
-		self.Variables[string(match[1])] = match[2]
+		variableName := string(match[1])
+		if self.Variables[variableName] == nil {
+			self.Variables[variableName] = match[2]
+		}
 		line = bytes.Replace(line, match[0], []byte{}, -1)
 	} else {
 		matches := varRe.FindAllSubmatch(line, -1)

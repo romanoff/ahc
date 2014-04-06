@@ -42,3 +42,28 @@ func TestClasses(t *testing.T) {
 		t.Errorf("Expected to get 2 classes, but got %v", len(classes))
 	}
 }
+
+func TestPreprocessorVariables(t *testing.T) {
+	css := Init()
+	css.Variables["main-color"] = []byte("blue")
+	acss := `
+	$main-color: red;
+.a {
+   color: $main-color;
+}
+`
+	css.Content = []byte(acss)
+	result, err := css.Get()
+	if err != nil {
+		t.Errorf("Expected to not get error while preprocessing css, but got %v", err)
+	}
+	expected := `
+
+.a {
+   color: blue;
+}
+`
+	if string(result) != expected {
+		t.Errorf("Expected to get:\n%v, but got:\n%v", string(result), expected)
+	}
+}
