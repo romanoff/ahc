@@ -3,13 +3,11 @@ package component
 import (
 	"github.com/romanoff/ahc/schema"
 	"testing"
-	"text/template"
 )
 
 func TestComponentTemplate(t *testing.T) {
-	tmpl := template.Must(template.New("button").
-		Parse("<div class='button'>{{.name}}</div>"))
-	c := &Component{Namespace: "goog.a-button", Template: tmpl}
+	tmpl := `<div class='button'>{{.name}}</div>`
+	c := &Component{Namespace: "goog.a-button", Template: &Template{Content: tmpl}}
 	params := make(map[string]interface{})
 	params["name"] = "Click me"
 	html, err := c.Render(params, nil)
@@ -23,9 +21,8 @@ func TestComponentTemplate(t *testing.T) {
 }
 
 func TestRenderSafeNoValidation(t *testing.T) {
-	tmpl := template.Must(template.New("a-button").
-		Parse("<div class='button'>{{.name}}</div>"))
-	c := &Component{Namespace: "goog.a-button", Template: tmpl}
+	tmpl := `<div class='button'>{{.name}}</div>`
+	c := &Component{Namespace: "goog.a-button", Template: &Template{Content: tmpl}}
 	params := make(map[string]interface{})
 	params["name"] = "Click me"
 	_, err := c.RenderSafe(params, nil)
@@ -35,11 +32,10 @@ func TestRenderSafeNoValidation(t *testing.T) {
 }
 
 func TestRenderSafeValidation(t *testing.T) {
-	tmpl := template.Must(template.New("button").
-		Parse("<div class='button'>{{.name}}</div>{{or .not_in_schema \"\"}}"))
+	tmpl := "<div class='button'>{{.name}}</div>{{or .not_in_schema \"\"}}"
 	c := &Component{
 		Namespace: "goog.a-button",
-		Template:  tmpl,
+		Template:  &Template{Content: tmpl},
 		Schema: &schema.Schema{Fields: []*schema.Field{
 			&schema.Field{Name: "name", Required: true, Type: schema.StringField},
 		}},
@@ -62,12 +58,10 @@ func TestRenderSafeValidation(t *testing.T) {
 }
 
 func TestRender(t *testing.T) {
-	tmpl := template.Must(template.New("button").
-		Parse("<div class='button'>{{.name}}</div>"))
-	tmpl1 := template.Must(template.New("multibutton").
-		Parse("<div class='multibutton'><a-button name='one'/><a-button name='two'/></div>"))
-	c := &Component{Namespace: "goog.a-button", Template: tmpl}
-	multibutton := &Component{Namespace: "goog.a-multibutton", Template: tmpl1}
+	tmpl := "<div class='button'>{{.name}}</div>"
+	tmpl1 := "<div class='multibutton'><a-button name='one'/><a-button name='two'/></div>"
+	c := &Component{Namespace: "goog.a-button", Template: &Template{Content: tmpl}}
+	multibutton := &Component{Namespace: "goog.a-multibutton", Template: &Template{Content: tmpl1}}
 	pool := &Pool{Components: []*Component{c, multibutton}}
 	params := make(map[string]interface{})
 	html, err := multibutton.Render(params, pool)
@@ -79,9 +73,8 @@ func TestRender(t *testing.T) {
 		t.Errorf("Expected to get:\n%v\n, but got:\n%v", expected, string(html))
 	}
 
-	tmpl2 := template.Must(template.New("multibutton").
-		Parse("<div class='multibutton'><a-button name='one'/><a-button name='two'/></div><img src='image.png' />"))
-	multibutton.Template = tmpl2
+	tmpl2 := "<div class='multibutton'><a-button name='one'/><a-button name='two'/></div><img src='image.png' />"
+	multibutton.Template = &Template{Content: tmpl2}
 	html, err = multibutton.Render(params, pool)
 	if err != nil {
 		t.Errorf("Expected not to get error while rendering complex component, but got %v", err)
@@ -94,11 +87,10 @@ func TestRender(t *testing.T) {
 }
 
 func TestCastParams(t *testing.T) {
-	tmpl := template.Must(template.New("button").
-		Parse("<div class='button' {{ if .hidden}}style='display: none;'{{end}}>{{.name}}</div>"))
+	tmpl := "<div class='button' {{ if .hidden}}style='display: none;'{{end}}>{{.name}}</div>"
 	c := &Component{
 		Namespace: "goog.a-button",
-		Template:  tmpl,
+		Template:  &Template{Content: tmpl},
 		Schema: &schema.Schema{Fields: []*schema.Field{
 			&schema.Field{Name: "name", Required: true, Type: schema.StringField},
 			&schema.Field{Name: "hidden", Type: schema.BoolField},

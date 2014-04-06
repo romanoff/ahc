@@ -3,7 +3,6 @@ package component
 import (
 	"github.com/romanoff/ahc/schema"
 	"testing"
-	"text/template"
 )
 
 func TestGetComponent(t *testing.T) {
@@ -19,9 +18,8 @@ func TestGetComponent(t *testing.T) {
 }
 
 func TestPoolRender(t *testing.T) {
-	tmpl := template.Must(template.New("button").
-		Parse("<div class='button'>{{.name}}</div>"))
-	c := &Component{Namespace: "goog.a-button", Template: tmpl}
+	tmpl := "<div class='button'>{{.name}}</div>"
+	c := &Component{Namespace: "goog.a-button", Template: &Template{Content: tmpl}}
 	pool := &Pool{Components: []*Component{c}}
 	ahcx := `
 <a-button name="Click me" />
@@ -38,9 +36,8 @@ func TestPoolRender(t *testing.T) {
 }
 
 func TestPoolRenderUsingNamespaceParams(t *testing.T) {
-	tmpl := template.Must(template.New("button").
-		Parse("<div class='button'>{{.name}}</div>"))
-	c := &Component{Namespace: "goog.a-button", Template: tmpl}
+	tmpl := "<div class='button'>{{.name}}</div>"
+	c := &Component{Namespace: "goog.a-button", Template: &Template{Content: tmpl}}
 	pool := &Pool{Components: []*Component{c}}
 	ahcx := `
 <a-button><a-button:name>Click me<a-button><a-button:name>Click me</a-button:name></a-button></a-button:name></a-button>
@@ -56,9 +53,8 @@ func TestPoolRenderUsingNamespaceParams(t *testing.T) {
 }
 
 func TestPoolRenderWithDefaultParams(t *testing.T) {
-	tmpl := template.Must(template.New("button").
-		Parse("<div class='button'>{{.name}}</div>"))
-	c := &Component{Namespace: "goog.a-button", Template: tmpl, DefaultParam: "name"}
+	tmpl := "<div class='button'>{{.name}}</div>"
+	c := &Component{Namespace: "goog.a-button", Template: &Template{Content: tmpl}, DefaultParam: "name"}
 	pool := &Pool{Components: []*Component{c}}
 	ahcx := `
 <a-button>Click me</a-button>
@@ -74,11 +70,10 @@ func TestPoolRenderWithDefaultParams(t *testing.T) {
 }
 
 func TestPoolRenderSafe(t *testing.T) {
-	tmpl := template.Must(template.New("button").
-		Parse("<div class='button'>{{.name}}</div>{{or .not_in_schema \"\"}}"))
+	tmpl := "<div class='button'>{{.name}}</div>{{or .not_in_schema \"\"}}"
 	c := &Component{
 		Namespace: "goog.a-button",
-		Template:  tmpl,
+		Template:  &Template{Content: tmpl},
 		Schema: &schema.Schema{Fields: []*schema.Field{
 			&schema.Field{Name: "name", Required: true, Type: schema.StringField},
 		}},
@@ -94,12 +89,10 @@ func TestPoolRenderSafe(t *testing.T) {
 }
 
 func TestPoolRenderContainerWithDefaultParams(t *testing.T) {
-	tmpl := template.Must(template.New("button").
-		Parse("<div class='button'>{{.name}}</div>"))
-	c := &Component{Namespace: "goog.a-button", Template: tmpl}
-	containerTmpl := template.Must(template.New("container").
-		Parse("<div class='container'>{{.content}}</div>"))
-	c1 := &Component{Namespace: "goog.a-container", Template: containerTmpl, DefaultParam: "content"}
+	tmpl := "<div class='button'>{{.name}}</div>"
+	c := &Component{Namespace: "goog.a-button", Template: &Template{Content: tmpl}}
+	containerTmpl := "<div class='container'>{{.content}}</div>"
+	c1 := &Component{Namespace: "goog.a-container", Template: &Template{Content: containerTmpl}, DefaultParam: "content"}
 	pool := &Pool{Components: []*Component{c, c1}}
 	ahcx := `
 <a-container><a-button name="Click me"/></a-container>

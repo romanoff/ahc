@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/jteeuwen/go-pkg-xmlx"
 	"github.com/romanoff/ahc/schema"
-	"text/template"
 )
 
 // Ahc component
@@ -15,7 +14,7 @@ type Component struct {
 	Requires     []string
 	DefaultParam string
 	Css          string
-	Template     *template.Template
+	Template     *Template
 	Schema       *schema.Schema
 }
 
