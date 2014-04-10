@@ -11,10 +11,21 @@ func Init() *Css {
 type Css struct {
 	Content   []byte
 	Variables map[string][]byte
+	compiled  bool
+}
+
+func (self *Css) Compile() error {
+	if !self.compiled {
+		err := self.ReplaceVariables()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (self *Css) Get() ([]byte, error) {
-	err := self.ReplaceVariables()
+	err := self.Compile()
 	if err != nil {
 		return nil, err
 	}
@@ -26,6 +37,10 @@ var selectorRe = regexp.MustCompile("(?s)([^{]*)\\s*{(.*?)}")
 var classRe = regexp.MustCompile("\\.(\\w+)")
 
 func (self *Css) Classes() ([]string, error) {
+	err := self.Compile()
+	if err != nil {
+		return nil, err
+	}
 	matches := selectorRe.FindAllSubmatch(self.Content, -1)
 	classes := []string{}
 	for _, match := range matches {
