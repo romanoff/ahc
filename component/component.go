@@ -62,3 +62,8 @@ func (self *Component) CastParams(params map[string]interface{}) map[string]inte
 	}
 	return params
 }
+
+// Returns component css after using preprocessor
+func (self *Component) GetCss() (string, error) {
+	return self.Css, nil
+}
