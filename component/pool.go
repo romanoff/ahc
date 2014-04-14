@@ -8,9 +8,10 @@ import (
 )
 
 type Pool struct {
-	Components []*Component
-	Pools      []*Pool
-	Safe       bool // Specifies if each component parametes should be checked again schema
+	Components   []*Component
+	Pools        []*Pool
+	Safe         bool // Specifies if each component parametes should be checked again schema
+	Preprocessor Preprocessor
 }
 
 func (self *Pool) GetComponent(namespace string) *Component {
