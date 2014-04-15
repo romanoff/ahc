@@ -65,5 +65,13 @@ func (self *Component) CastParams(params map[string]interface{}) map[string]inte
 
 // Returns component css after using preprocessor
 func (self *Component) GetCss(pool *Pool) (string, error) {
+	if pool != nil && pool.Preprocessor != nil {
+		preprocessor := pool.Preprocessor
+		cssContent, err := preprocessor.GetCss([]byte(self.Css))
+		if err != nil {
+			return "", err
+		}
+		return string(cssContent), nil
+	}
 	return self.Css, nil
 }
