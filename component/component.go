@@ -65,9 +65,18 @@ func (self *Component) CastParams(params map[string]interface{}) map[string]inte
 
 // Returns component css after using preprocessor
 func (self *Component) GetCss(pool *Pool) (string, error) {
+	cssContent := ""
+	for _, namespace := range self.Requires {
+		component := pool.GetComponent(namespace)
+		if component == nil {
+			return "", errors.New(fmt.Sprintf("Missing require: %v", namespace))
+		}
+		cssContent += component.Css + "\n"
+	}
+	cssContent += self.Css
 	if pool != nil && pool.Preprocessor != nil {
 		preprocessor := pool.Preprocessor
-		cssContent, err := preprocessor.GetCss([]byte(self.Css))
+		cssContent, err := preprocessor.GetCss([]byte(cssContent))
 		if err != nil {
 			return "", err
 		}
