@@ -63,17 +63,28 @@ func (self *Component) CastParams(params map[string]interface{}) map[string]inte
 	return params
 }
 
-// Returns component css after using preprocessor
-func (self *Component) GetCss(pool *Pool) (string, error) {
+func (self *Component) GetRawCss(pool *Pool) (string, error) {
 	cssContent := ""
 	for _, namespace := range self.Requires {
 		component := pool.GetComponent(namespace)
 		if component == nil {
 			return "", errors.New(fmt.Sprintf("Missing require: %v", namespace))
 		}
-		cssContent += component.Css + "\n"
+		componentCss, err := component.GetRawCss(pool)
+		if err != nil {
+			return "", err
+		}
+		cssContent += componentCss + "\n"
 	}
-	cssContent += self.Css
+	return cssContent, nil
+}
+
+// Returns component css after using preprocessor
+func (self *Component) GetCss(pool *Pool) (string, error) {
+	cssContent, err := self.GetRawCss(pool)
+	if err != nil {
+		return "", err
+	}
 	if pool != nil && pool.Preprocessor != nil {
 		preprocessor := pool.Preprocessor
 		cssContent, err := preprocessor.GetCss([]byte(cssContent))
@@ -82,5 +93,5 @@ func (self *Component) GetCss(pool *Pool) (string, error) {
 		}
 		return string(cssContent), nil
 	}
-	return self.Css, nil
+	return cssContent, nil
 }
