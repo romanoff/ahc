@@ -108,3 +108,7 @@ func TestCastParams(t *testing.T) {
 		t.Errorf("Expected to get:\n%v\n, but got:\n%v", expected, string(html))
 	}
 }
+
+func TestGetCss(t *testing.T) {
+	//TODO: Write GetCss test
+}
