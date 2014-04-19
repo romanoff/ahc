@@ -110,5 +110,16 @@ func TestCastParams(t *testing.T) {
 }
 
 func TestGetCss(t *testing.T) {
-	//TODO: Write GetCss test
+	c := &Component{
+		Namespace: "goog.a-button",
+		Css:       ".goog_button { color: red; }",
+	}
+	css, err := c.GetCss(nil)
+	if err != nil {
+		t.Errorf("Expected to not get error while extracting css, but got %v", err)
+	}
+	expected := ".goog_button { color: red; }"
+	if expected != css {
+		t.Errorf("Expected to get:\n%v\n, but got:\n%v", expected, css)
+	}
 }

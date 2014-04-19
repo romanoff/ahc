@@ -76,6 +76,7 @@ func (self *Component) GetRawCss(pool *Pool) (string, error) {
 		}
 		cssContent += componentCss + "\n"
 	}
+	cssContent += self.Css
 	return cssContent, nil
 }
 
