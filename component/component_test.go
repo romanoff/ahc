@@ -123,3 +123,6 @@ func TestGetCss(t *testing.T) {
 		t.Errorf("Expected to get:\n%v\n, but got:\n%v", expected, css)
 	}
 }
+
+func TestGetClassWithRequires(t *testing.T) {
+}
