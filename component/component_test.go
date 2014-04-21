@@ -125,4 +125,16 @@ func TestGetCss(t *testing.T) {
 }
 
 func TestGetClassWithRequires(t *testing.T) {
+	c1 := &Component{Namespace: "goog.a-button", Css: ".button {}"}
+	c2 := &Component{Namespace: "goog.a-multibutton", Css: ".multibutton {}", Requires: []string{"goog.a-button"}}
+	pool := &Pool{Components: []*Component{c1, c2}}
+	multibuttonCss, err := c2.GetCss(pool)
+	if err != nil {
+		t.Errorf("Expected to not get error while extracting css, but got %v", err)
+	}
+	expected := `.button {}
+.multibutton {}`
+	if expected != multibuttonCss {
+		t.Errorf("Expected to get:\n%v\n, but got:\n%v", expected, multibuttonCss)
+	}
 }
