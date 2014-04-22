@@ -138,3 +138,29 @@ func TestGetClassWithRequires(t *testing.T) {
 		t.Errorf("Expected to get:\n%v\n, but got:\n%v", expected, multibuttonCss)
 	}
 }
+
+type TestPreprocessor struct {
+}
+
+func (self *TestPreprocessor) GetCss(input []byte) ([]byte, error) {
+	returnValue := []byte("/*Added by preprocessor*/\n")
+	returnValue = append(returnValue, input...)
+	return returnValue, nil
+}
+
+func TestGetClassWithPreprocessor(t *testing.T) {
+	c1 := &Component{Namespace: "goog.a-button", Css: ".button {}"}
+	c2 := &Component{Namespace: "goog.a-multibutton", Css: ".multibutton {}", Requires: []string{"goog.a-button"}}
+	preprocessor := &TestPreprocessor{}
+	pool := &Pool{Components: []*Component{c1, c2}, Preprocessor: preprocessor}
+	multibuttonCss, err := c2.GetCss(pool)
+	if err != nil {
+		t.Errorf("Expected to not get error while extracting css, but got %v", err)
+	}
+	expected := `/*Added by preprocessor*/
+.button {}
+.multibutton {}`
+	if expected != multibuttonCss {
+		t.Errorf("Expected to get:\n%v\n, but got:\n%v", expected, multibuttonCss)
+	}
+}
