@@ -32,6 +32,16 @@ func (self *Css) Get() ([]byte, error) {
 	return self.Content, nil
 }
 
+func (self *Css) GetCss(content []byte) ([]byte, error) {
+	self.Content = content
+	self.compiled = false
+	err := self.Compile()
+	if err != nil {
+		return nil, err
+	}
+	return self.Content, nil
+}
+
 // Return css classes
 var selectorRe = regexp.MustCompile("(?s)([^{]*)\\s*{(.*?)}")
 var classRe = regexp.MustCompile("\\.(\\w+)")

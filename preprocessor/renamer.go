@@ -9,7 +9,7 @@ type Renamer struct {
 	Classes map[string]string
 }
 
-func (self *Renamer) ProcessComponent(c *component.Component) (error) {
+func (self *Renamer) ProcessComponent(c *component.Component) error {
 	return nil
 }
 
