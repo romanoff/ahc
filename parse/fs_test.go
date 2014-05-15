@@ -1,6 +1,7 @@
 package parse
 
 import (
+	"github.com/kr/pretty"
 	"testing"
 )
 
@@ -32,5 +33,8 @@ func TestReadCss(t *testing.T) {
 	}
 	if component.Template == nil {
 		t.Error("Expected to get button template, but got nil")
+	}
+	if component.Schema == nil || len(component.Schema.Fields) != 5 {
+		t.Errorf("Expected to get schema with 5 fields, but got %# v", pretty.Formatter(component.Schema))
 	}
 }
