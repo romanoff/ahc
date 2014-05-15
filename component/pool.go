@@ -14,6 +14,8 @@ type Pool struct {
 	Preprocessor Preprocessor
 }
 
+//Returns component from the pool that matches namespace. If component is not found,
+//goes through other pools it's assosiated with sequentially.
 func (self *Pool) GetComponent(namespace string) *Component {
 	for _, component := range self.Components {
 		if namespace == component.Namespace || strings.HasSuffix(component.Namespace, "."+namespace) {
@@ -30,6 +32,7 @@ func (self *Pool) GetComponent(namespace string) *Component {
 	return nil
 }
 
+//Renders html (has to be valid xml) and renders all the custom components (those that have - in their name)
 func (self *Pool) Render(template []byte) ([]byte, error) {
 	document := xmlx.New()
 	document.LoadBytes(template, nil)
