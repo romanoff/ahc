@@ -1,0 +1,14 @@
+Input:
+{"name": "Button"}
+Expected:
+<div class="svs_button">Button</div>
+
+Input:
+{"name": "Button", "url": "#"}
+Expected:
+<a class="svs_button" href="#">Button</a>
+
+Input:
+{"name": "Button", "url": "#", "type": "action"}
+Expected:
+<a class="svs_button svs_button_action" href="#">Button</a>

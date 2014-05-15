@@ -1,0 +1,5 @@
+name {string} Button name
+url {string=} Optional button url
+type {string}{action} Button type
+size {string=}{small} Optional button size parameter
+hidden {bool=} Optional button visibility
