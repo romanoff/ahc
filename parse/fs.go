@@ -1,10 +1,13 @@
 package parse
 
 import (
-	"github.com/romanoff/ahc/component"
-	"os"
 	"errors"
 	"fmt"
+	"github.com/romanoff/ahc/component"
+	"io/ioutil"
+	"os"
+	"path"
+	"strings"
 )
 
 type Fs struct {
@@ -15,5 +18,35 @@ func (self *Fs) ParseComponent(filepath string) (*component.Component, error) {
 	if _, err := os.Stat(filepath); err != nil {
 		return nil, errors.New(fmt.Sprintf("Error whie parsing component: %v file doesn't exist", filepath))
 	}
-	return nil, nil
+	// Get base path (/a/b.css -> /a/b)
+	filename := path.Base(filepath)
+	filename = strings.TrimSuffix(filename, path.Ext(filepath))
+	basePath := path.Dir(filepath) + "/" + filename
+	component := &component.Component{}
+	err := self.readAll(component, basePath)
+	if err != nil {
+		return nil, err
+	}
+	return component, nil
+}
+
+func (self *Fs) readAll(component *component.Component, basePath string) error {
+	err := self.readCss(component, basePath)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (self *Fs) readCss(component *component.Component, basePath string) error {
+	filepath := basePath + ".css"
+	if _, err := os.Stat(filepath); err != nil {
+		return nil
+	}
+	content, err := ioutil.ReadFile(filepath)
+	if err != nil {
+		return errors.New(fmt.Sprintf("Error while reading css file: %v", filepath))
+	}
+	component.Css = string(content)
+	return nil
 }

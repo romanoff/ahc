@@ -1,17 +1,16 @@
-{{define "cssClass"}}{css ahc_button}{{end}}
 {{ if .url}}
-<a class="{{template "cssClass" .}}{{if .type | eq "action"}}{{sp}}{css ahc_button_action}{{end}}
+<a class="ahc_button {{if .type | eq "action"}} ahc_button_action{{end}}
 {{if .size}}
   {{if .size | eq "small"}}
-  {{sp}}{css ahc_button_small}
+    ahc_button_small
   {{end}}
 {{end}}
 " href="{{.url|html}}">{{.name|html}}</a>
 {{else}}
-<div class="{css ahc_button}{{if .type | eq "action"}}{{sp}}{css ahc_button_action}{{end}}
+<div class=" ahc_button{{if .type | eq "action"}}  ahc_button_action{{end}}
 {{if .size}}
   {{if .size | eq "small"}}
-  {{sp}}{css ahc_button_small}
+    ahc_button_small
   {{end}}
 {{end}}
 ">{{.name|html}}</div>
