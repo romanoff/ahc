@@ -24,15 +24,6 @@ func (self *HtmlTag) GetContent(pool *component.Pool) []byte {
 	return nil
 }
 
-type Text struct {
-	Uuid    string
-	Content string
-}
-
-func (self *Text) GetContent(pool *component.Pool) []byte {
-	return nil
-}
-
 type AhcTag struct {
 	Uuid         string
 	Name         string

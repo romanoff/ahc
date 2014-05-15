@@ -21,7 +21,7 @@ func getViewTags(nodes []*xmlx.Node) ([]Tag, error) {
 	for _, node := range nodes {
 		if node.Type == xmlx.NT_TEXT {
 			if strings.TrimSpace(node.Value) != "" {
-				tags = append(tags, &Text{Content: node.Value})
+				tags = append(tags, &Text{Content: []byte(node.Value)})
 			}
 		}
 		if node.Type != xmlx.NT_ELEMENT {
@@ -61,7 +61,7 @@ func getAhcNodeParams(node *xmlx.Node) (map[string][]Tag, []Tag, error) {
 	params := make(map[string][]Tag)
 	defaultParam := make([]Tag, 0, 0)
 	for _, attribute := range node.Attributes {
-		params[attribute.Name.Local] = []Tag{&Text{Content: attribute.Value}}
+		params[attribute.Name.Local] = []Tag{&Text{Content: []byte(attribute.Value)}}
 	}
 	if len(node.Children) > 0 && nodesHaveNamespace(node.Children, node.Name.Local) {
 		for _, child := range node.Children {
