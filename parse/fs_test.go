@@ -30,4 +30,7 @@ func TestReadCss(t *testing.T) {
 	if len(component.Requires) != 1 || component.Requires[0] != "ahc.reset" {
 		t.Errorf("Expected to get ahc.reset as require for button component, but got %v", component.Requires)
 	}
+	if component.Template == nil {
+		t.Error("Expected to get button template, but got nil")
+	}
 }

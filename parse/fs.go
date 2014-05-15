@@ -36,6 +36,10 @@ func (self *Fs) readAll(component *component.Component, basePath string) error {
 	if err != nil {
 		return err
 	}
+	err = self.readTemplate(component, basePath)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -67,5 +71,19 @@ func (self *Fs) readCss(component *component.Component, basePath string) error {
 			component.Requires = append(component.Requires, string(matches[1]))
 		}
 	}
+	return nil
+}
+
+func (self *Fs) readTemplate(c *component.Component, basePath string) error {
+	filepath := basePath + ".tmpl"
+	if _, err := os.Stat(filepath); err != nil {
+		return nil
+	}
+	content, err := ioutil.ReadFile(filepath)
+	if err != nil {
+		return errors.New(fmt.Sprintf("Error while reading tmpl file: %v", filepath))
+	}
+	template := &component.Template{Content: string(content)}
+	c.Template = template
 	return nil
 }
