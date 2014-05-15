@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"regexp"
 	"strings"
 )
 
@@ -38,6 +39,9 @@ func (self *Fs) readAll(component *component.Component, basePath string) error {
 	return nil
 }
 
+var provideRe *regexp.Regexp = regexp.MustCompile("@provide\\s+['\"](.+)['\"]")
+var defaultParamRe *regexp.Regexp = regexp.MustCompile("@default_param\\s+['\"](.+)['\"]")
+
 func (self *Fs) readCss(component *component.Component, basePath string) error {
 	filepath := basePath + ".css"
 	if _, err := os.Stat(filepath); err != nil {
@@ -48,5 +52,13 @@ func (self *Fs) readCss(component *component.Component, basePath string) error {
 		return errors.New(fmt.Sprintf("Error while reading css file: %v", filepath))
 	}
 	component.Css = string(content)
+	matches := provideRe.FindSubmatch(content)
+	if len(matches) == 2 {
+		component.Namespace = string(matches[1])
+	}
+	matches = defaultParamRe.FindSubmatch(content)
+	if len(matches) == 2 {
+		component.DefaultParam = string(matches[1])
+	}
 	return nil
 }
