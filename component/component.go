@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/jteeuwen/go-pkg-xmlx"
 	"github.com/romanoff/ahc/schema"
+	"strings"
 )
 
 // Ahc component
@@ -16,6 +17,13 @@ type Component struct {
 	Css          string
 	Template     *Template
 	Schema       *schema.Schema
+}
+
+func (self *Component) Validate() error {
+	if strings.TrimSpace(self.Namespace) == "" {
+		return errors.New("component is missing namespace")
+	}
+	return nil
 }
 
 // Renders component with params

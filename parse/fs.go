@@ -30,6 +30,10 @@ func (self *Fs) ParseComponent(filepath string) (*component.Component, error) {
 	if err != nil {
 		return nil, err
 	}
+	err = component.Validate()
+	if err != nil {
+		return nil, err
+	}
 	return component, nil
 }
 

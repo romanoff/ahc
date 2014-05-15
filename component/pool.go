@@ -14,6 +14,12 @@ type Pool struct {
 	Preprocessor Preprocessor
 }
 
+// TODO: Check that appended component has uniq namespace
+func (self *Pool) AppendComponent(component *Component) error {
+	self.Components = append(self.Components, component)
+	return nil
+}
+
 //Returns component from the pool that matches namespace. If component is not found,
 //goes through other pools it's assosiated with sequentially.
 func (self *Pool) GetComponent(namespace string) *Component {
