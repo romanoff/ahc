@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/romanoff/ahc/component"
+	"github.com/romanoff/ahc/schema"
 	"io/ioutil"
 	"os"
 	"path"
@@ -37,6 +38,10 @@ func (self *Fs) readAll(component *component.Component, basePath string) error {
 		return err
 	}
 	err = self.readTemplate(component, basePath)
+	if err != nil {
+		return err
+	}
+	err = self.readSchema(component, basePath)
 	if err != nil {
 		return err
 	}
@@ -85,5 +90,20 @@ func (self *Fs) readTemplate(c *component.Component, basePath string) error {
 	}
 	template := &component.Template{Content: string(content)}
 	c.Template = template
+	return nil
+}
+
+func (self *Fs) readSchema(c *component.Component, basePath string) error {
+	filepath := basePath + ".schema"
+	if _, err := os.Stat(filepath); err != nil {
+		return nil
+	}
+	_, err := ioutil.ReadFile(filepath)
+	if err != nil {
+		return errors.New(fmt.Sprintf("Error while reading schema file: %v", filepath))
+	}
+	fields := make([]*schema.Field, 0, 0)
+	schema := &schema.Schema{Fields: fields}
+	c.Schema = schema
 	return nil
 }
