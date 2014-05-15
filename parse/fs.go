@@ -41,6 +41,7 @@ func (self *Fs) readAll(component *component.Component, basePath string) error {
 
 var provideRe *regexp.Regexp = regexp.MustCompile("@provide\\s+['\"](.+)['\"]")
 var defaultParamRe *regexp.Regexp = regexp.MustCompile("@default_param\\s+['\"](.+)['\"]")
+var requireRe *regexp.Regexp = regexp.MustCompile("@require\\s+['\"](.+)['\"]")
 
 func (self *Fs) readCss(component *component.Component, basePath string) error {
 	filepath := basePath + ".css"
@@ -59,6 +60,12 @@ func (self *Fs) readCss(component *component.Component, basePath string) error {
 	matches = defaultParamRe.FindSubmatch(content)
 	if len(matches) == 2 {
 		component.DefaultParam = string(matches[1])
+	}
+	allMatches := requireRe.FindAllSubmatch(content, -1)
+	for _, matches := range allMatches {
+		if len(matches) == 2 {
+			component.Requires = append(component.Requires, string(matches[1]))
+		}
 	}
 	return nil
 }

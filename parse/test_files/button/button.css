@@ -1,6 +1,7 @@
 /**
  * @provide 'ahc.button'
  * @default_param 'name'
+ * @require 'ahc.reset'
  */
 .ahc_button {
     background-color: #999;

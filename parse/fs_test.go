@@ -27,4 +27,7 @@ func TestReadCss(t *testing.T) {
 	if component.DefaultParam != "name" {
 		t.Errorf("Expected button component default param to be name, but got '%v'", component.DefaultParam)
 	}
+	if len(component.Requires) != 1 || component.Requires[0] != "ahc.reset" {
+		t.Errorf("Expected to get ahc.reset as require for button component, but got %v", component.Requires)
+	}
 }
