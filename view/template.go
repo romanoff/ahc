@@ -2,7 +2,10 @@ package view
 
 import (
 	"bytes"
+	"errors"
+	"fmt"
 	"github.com/romanoff/ahc/component"
+	"github.com/romanoff/ahc/schema"
 	"html/template"
 )
 
@@ -10,6 +13,7 @@ type Template struct {
 	Content  string
 	compiled bool
 	Template *template.Template
+	Schema   *schema.Schema
 }
 
 func (self *Template) compileTemplate() error {
@@ -26,6 +30,16 @@ func (self *Template) render(params map[string]interface{}, pool *component.Pool
 		err := self.compileTemplate()
 		if err != nil {
 			return nil, err
+		}
+	}
+	if self.Schema != nil && safe {
+		schemaErrors := self.Schema.Validate(params)
+		if len(schemaErrors) != 0 {
+			errorString := ""
+			for _, err := range schemaErrors {
+				errorString += fmt.Sprintf("%v\n", err)
+			}
+			return nil, errors.New(errorString)
 		}
 	}
 	out := bytes.Buffer{}
