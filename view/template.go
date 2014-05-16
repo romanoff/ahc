@@ -21,7 +21,7 @@ func (self *Template) compileTemplate() error {
 	return nil
 }
 
-func (self *Template) Render(params map[string]interface{}, pool *component.Pool) ([]byte, error) {
+func (self *Template) render(params map[string]interface{}, pool *component.Pool, safe bool) ([]byte, error) {
 	if !self.compiled {
 		err := self.compileTemplate()
 		if err != nil {
@@ -37,5 +37,13 @@ func (self *Template) Render(params map[string]interface{}, pool *component.Pool
 	if err != nil {
 		return nil, err
 	}
-	return view.GetContent(&RenderParams{Pool: pool})
+	return view.GetContent(&RenderParams{Pool: pool, Safe: safe})
+}
+
+func (self *Template) Render(params map[string]interface{}, pool *component.Pool) ([]byte, error) {
+	return self.render(params, pool, false)
+}
+
+func (self *Template) RenderSafe(params map[string]interface{}, pool *component.Pool) ([]byte, error) {
+	return self.render(params, pool, true)
 }
