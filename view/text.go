@@ -1,14 +1,10 @@
 package view
 
-import (
-	"github.com/romanoff/ahc/component"
-)
-
 type Text struct {
 	Uuid    string
 	Content []byte
 }
 
-func (self *Text) GetContent(pool *component.Pool) []byte {
-	return self.Content
+func (self *Text) GetContent(rParams *RenderParams) ([]byte, error) {
+	return self.Content, nil
 }

@@ -8,33 +8,32 @@ type View struct {
 	Tags []Tag
 }
 
+func (self *View) GetContent(rParams *RenderParams) ([]byte, error) {
+	return getTagsContent(self.Tags, rParams)
+}
+
+func getTagsContent(tags []Tag, rParams *RenderParams) ([]byte, error) {
+	tagsContent := []byte{}
+	for _, tag := range tags {
+		content, err := tag.GetContent(rParams)
+		if err != nil {
+			return nil, err
+		}
+		tagsContent = append(tagsContent, content...)
+	}
+	return tagsContent, nil
+}
+
 type Attribute struct {
 	Name  string
 	Value string
 }
 
-type HtmlTag struct {
-	Name       string
-	Attributes []*Attribute
-	Uuid       string
-	Children   []Tag
-}
-
-func (self *HtmlTag) GetContent(pool *component.Pool) []byte {
-	return nil
-}
-
-type AhcTag struct {
-	Uuid         string
-	Name         string
-	Params       map[string][]Tag
-	DefaultParam []Tag
-}
-
-func (self *AhcTag) GetContent(pool *component.Pool) []byte {
-	return nil
+type RenderParams struct {
+	Pool *component.Pool
+	Safe bool
 }
 
 type Tag interface {
-	GetContent(*component.Pool) []byte
+	GetContent(*RenderParams) ([]byte, error)
 }
