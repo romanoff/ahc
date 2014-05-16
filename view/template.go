@@ -10,6 +10,7 @@ import (
 )
 
 type Template struct {
+	Path     string
 	Content  string
 	compiled bool
 	Template *template.Template
