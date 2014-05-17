@@ -35,18 +35,3 @@ func (self *Fs) ParseTemplate(filepath string, basepath string) (*view.Template,
 	template := &view.Template{Content: string(content)}
 	return template, nil
 }
-
-func (self *Fs) ParseSchema(content []byte) {
-	lines := bytes.Split(content, []byte("\n"))
-	for _, line := range lines {
-		field, err := self.parseSchemaField(line)
-		if err != nil && len(bytes.TrimSpace(line)) != 0 {
-			return errors.New(fmt.Sprintf("Couldn't parse field: '%s' for schema in following file: '%v'", line, filepath))
-		}
-		if err == nil {
-			fields = append(fields, field)
-		}
-	}
-	schema := &schema.Schema{Fields: fields}
-	return schema
-}
