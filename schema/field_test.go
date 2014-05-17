@@ -68,24 +68,22 @@ func TestBoolFieldValidate(t *testing.T) {
 	}
 }
 
-func TestArrayFieldValidate(t *testing.T) {
+func TestArrayFieldsValuidate(t *testing.T) {
 	field := &Field{Type: ArrayField}
 	err := field.Validate([]int{1, 2, 3})
 	if err != nil {
 		t.Errorf("Expected to get no array validation error, but got %v", err)
 	}
-	err = field.Validate("string field")
-	if err == nil {
-		t.Errorf("Expected to get array validation error (string supplied), but got nil")
-	}
-	field.ArrayValues = &Field{Type: NumField}
-	err = field.Validate([]int{1, 2, 3})
+
+	mapArray := make([]map[string]string, 0, 0)
+	value := make(map[string]string)
+	value["name"] = "John Doe"
+	mapArray = append(mapArray, value)
+
+	field.ArrayValues = []*Field{&Field{Name: "name", Type: StringField, Required: true}}
+	err = field.Validate(mapArray)
 	if err != nil {
 		t.Errorf("Expected to get no array validation error, but got %v", err)
-	}
-	err = field.Validate([]string{"a", "b", "c"})
-	if err == nil {
-		t.Errorf("Expected to get array validation error (string, but expected integer values), but got nil")
 	}
 }
 

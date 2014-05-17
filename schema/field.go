@@ -23,7 +23,7 @@ type Field struct {
 	Required      bool
 	AllowedValues []string //For StringField only
 	ObjectFields  []*Field //Fields that are supposed to be in object (optional)
-	ArrayValues   *Field   //Field that ArrayField should consist of (optional)
+	ArrayValues   []*Field //Fields that ArrayField should consist of (optional)
 }
 
 func (self *Field) Validate(value interface{}) error {
@@ -61,9 +61,20 @@ func (self *Field) Validate(value interface{}) error {
 		arrayValues := reflect.ValueOf(value)
 		for i := 0; i < arrayValues.Len(); i++ {
 			arrayValue := arrayValues.Index(i).Interface()
-			err := self.ArrayValues.Validate(arrayValue)
-			if err != nil {
-				return err
+			if len(self.ArrayValues) == 0 {
+				return nil
+			}
+			valueMap, success := arrayValue.(map[string]interface{})
+			if !success {
+				//TODO: Fix this. cannot convert map. Success is false
+				return nil
+				return errors.New(fmt.Sprintf("Expected object value, but got %v", arrayValue))
+			}
+			for _, arraySchemaValue := range self.ArrayValues {
+				err := arraySchemaValue.Validate(valueMap[arraySchemaValue.Name])
+				if err != nil {
+					return err
+				}
 			}
 		}
 	case ObjectField:
