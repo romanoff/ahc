@@ -47,7 +47,7 @@ func (self *Fs) ParseTemplate(templatepath string, basepath string) (*view.Templ
 	template := &view.Template{
 		Content: string(content),
 		Schema:  schema,
-		Path:    strings.TrimPrefix(absFilepath, absBasepath),
+		Path:    strings.TrimPrefix(strings.TrimPrefix(absFilepath, absBasepath), "/"),
 	}
 	return template, nil
 }

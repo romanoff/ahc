@@ -22,7 +22,7 @@ func TestReadCss(t *testing.T) {
 	if component.Css == "" {
 		t.Errorf("Expected component css to not be empty after parsing button css")
 	}
-	if component.Namespace != "ahc.button" {
+	if component.Namespace != "ahc.a-button" {
 		t.Errorf("Expected button component namespace to be ahc.button, but got '%v'", component.Namespace)
 	}
 	if component.DefaultParam != "name" {
