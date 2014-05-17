@@ -20,9 +20,7 @@ func (self *Fs) ParseComponent(filepath string) (*component.Component, error) {
 		return nil, errors.New(fmt.Sprintf("Error whie parsing component: %v file doesn't exist", filepath))
 	}
 	// Get base path (/a/b.css -> /a/b)
-	filename := path.Base(filepath)
-	filename = strings.TrimSuffix(filename, path.Ext(filepath))
-	basePath := path.Dir(filepath) + "/" + filename
+	basePath := strings.TrimSuffix(filepath, path.Ext(filepath))
 	component := &component.Component{}
 	err := self.readAll(component, basePath)
 	if err != nil {
