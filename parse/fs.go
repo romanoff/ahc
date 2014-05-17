@@ -1,11 +1,9 @@
 package parse
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"github.com/romanoff/ahc/component"
-	"github.com/romanoff/ahc/schema"
 	"io/ioutil"
 	"os"
 	"path"
@@ -107,18 +105,10 @@ func (self *Fs) readSchema(c *component.Component, basePath string) error {
 	if err != nil {
 		return errors.New(fmt.Sprintf("Error while reading schema file: %v", filepath))
 	}
-	fields := make([]*schema.Field, 0, 0)
-	lines := bytes.Split(content, []byte("\n"))
-	for _, line := range lines {
-		field, err := self.parseSchemaField(line)
-		if err != nil && len(bytes.TrimSpace(line)) != 0 {
-			return errors.New(fmt.Sprintf("Couldn't parse field: '%s' for schema in following file: '%v'", line, filepath))
-		}
-		if err == nil {
-			fields = append(fields, field)
-		}
+	schema, err := self.ParseSchema(content, filepath)
+	if err != nil {
+		return err
 	}
-	schema := &schema.Schema{Fields: fields}
 	c.Schema = schema
 	return nil
 }
