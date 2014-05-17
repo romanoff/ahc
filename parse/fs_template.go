@@ -23,15 +23,19 @@ func (self *Fs) ParseTemplate(filepath string, basepath string) (*view.Template,
 	basePath := path.Dir(filepath) + "/" + filename
 	schemaPath := basePath + ".schema"
 	//schemaContent
-	_, err := ioutil.ReadFile(schemaPath)
+	content, err := ioutil.ReadFile(schemaPath)
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("Error while reading template '%v' schema: %v", filepath, err))
 	}
-	// Parse schema content
-	content, err := ioutil.ReadFile(filepath)
+	schema, err := self.ParseSchema(content, schemaPath)
+	if err != nil {
+		return nil, err
+	}
+
+	content, err = ioutil.ReadFile(filepath)
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("Error while reading template '%v': %v", filepath, err))
 	}
-	template := &view.Template{Content: string(content)}
+	template := &view.Template{Content: string(content), Schema: schema}
 	return template, nil
 }
