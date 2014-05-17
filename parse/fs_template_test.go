@@ -13,4 +13,7 @@ func TestParseTemplate(t *testing.T) {
 	if tmpl.Path != "index" {
 		t.Errorf("Expected to get 'index' as template path, but got '%v'", tmpl.Path)
 	}
+	if tmpl.Schema == nil {
+		t.Error("Expected to get 'index' template schema, but got nil")
+	}
 }
