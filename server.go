@@ -5,14 +5,16 @@ import (
 	"github.com/romanoff/ahc/component"
 	"github.com/romanoff/ahc/parse"
 	"github.com/romanoff/ahc/view"
+	"github.com/romanoff/htmlcompressor"
 	"net/http"
 	"strings"
 )
 
 type AhcServer struct {
-	TemplatesPool *view.Pool
-	Dev           bool
-	FsParser      *parse.Fs
+	TemplatesPool  *view.Pool
+	Dev            bool
+	FsParser       *parse.Fs
+	HtmlCompressor *htmlcompressor.HtmlCompressor
 }
 
 func (self *AhcServer) ReadComponents() {
@@ -40,7 +42,7 @@ func (self *AhcServer) ViewHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, err)
 		return
 	}
-	w.Write(content)
+	w.Write(self.HtmlCompressor.Compress(content))
 }
 
 func (self *AhcServer) IndexHandler(w http.ResponseWriter, r *http.Request) {
@@ -48,7 +50,7 @@ func (self *AhcServer) IndexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func StartServer(options map[string]string) {
-	server := &AhcServer{FsParser: &parse.Fs{}}
+	server := &AhcServer{FsParser: &parse.Fs{}, HtmlCompressor: htmlcompressor.InitAll()}
 	server.Dev = (options["dev"] == "true")
 	server.ReadComponents()
 	port := options["port"]
