@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/foize/go.sgr"
 	"github.com/romanoff/ahc/component"
 	"github.com/romanoff/ahc/parse"
 	"github.com/romanoff/ahc/view"
@@ -45,6 +47,27 @@ func (self *AhcServer) ViewHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(self.HtmlCompressor.Compress(content))
 }
 
+func (self *AhcServer) TemplateHandler(w http.ResponseWriter, r *http.Request) {
+	if self.Dev {
+		self.ReadComponents()
+	}
+	path := strings.TrimPrefix(r.URL.Path, "/t/")
+	fmt.Print(sgr.MustParseln(fmt.Sprintf("Rendering  [fg-green]%v[reset]", path)))
+	jsonParam := r.FormValue("params")
+	params := make(map[string]interface{})
+	err := json.Unmarshal([]byte(jsonParam), &params)
+	if err != nil {
+		fmt.Fprintf(w, "Json unmarshaling error: %v", err)
+		return
+	}
+	content, err := self.TemplatesPool.Render(path, params)
+	if err != nil {
+		fmt.Fprint(w, err)
+		return
+	}
+	w.Write(self.HtmlCompressor.Compress(content))
+}
+
 func (self *AhcServer) IndexHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "List of all components and views should be shown here")
 }
@@ -59,5 +82,6 @@ func StartServer(options map[string]string) {
 	}
 	http.HandleFunc("/", server.IndexHandler)
 	http.HandleFunc("/v/", server.ViewHandler)
+	http.HandleFunc("/t/", server.TemplateHandler)
 	http.ListenAndServe(":"+port, nil)
 }
