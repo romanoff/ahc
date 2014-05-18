@@ -16,7 +16,7 @@ type Pool struct {
 	Templates      map[string]*Template
 	templates      *template.Template
 	Pools          []*Pool
-	componentsPool *component.Pool
+	ComponentsPool *component.Pool
 }
 
 func (self *Pool) AddTemplate(tmpl *Template) error {
@@ -55,7 +55,7 @@ func (self *Pool) render(path string, params map[string]interface{}, safe bool) 
 	if err != nil {
 		return nil, err
 	}
-	return view.GetContent(&RenderParams{Pool: self.componentsPool, Safe: safe})
+	return view.GetContent(&RenderParams{Pool: self.ComponentsPool, Safe: safe})
 }
 
 func (self *Pool) Render(path string, params map[string]interface{}) ([]byte, error) {
