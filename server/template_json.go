@@ -5,6 +5,6 @@ type TemplateJson struct {
 }
 
 type JsonGroup struct {
-	Name string
+	Name   string
 	Params map[string]interface{}
 }
