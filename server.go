@@ -12,12 +12,13 @@ import (
 type AhcServer struct {
 	TemplatesPool *view.Pool
 	Dev           bool
+	FsParser      *parse.Fs
 }
 
 func (self *AhcServer) ReadComponents() {
 	componentsPool := &component.Pool{}
 	self.TemplatesPool = view.InitPool()
-	fsParser := &parse.Fs{}
+	fsParser := self.FsParser
 	fsParser.ParseIntoPool(componentsPool, "components")
 	fsParser.ParseIntoTemplatePool(self.TemplatesPool, "templates")
 	self.TemplatesPool.ComponentsPool = componentsPool
@@ -28,7 +29,12 @@ func (self *AhcServer) ViewHandler(w http.ResponseWriter, r *http.Request) {
 		self.ReadComponents()
 	}
 	path := strings.TrimPrefix(r.URL.Path, "/v/")
-	params := make(map[string]interface{})
+	templateJson, err := self.FsParser.ParseTemplateJson("templates/" + path + ".json")
+	if err != nil {
+		fmt.Fprint(w, err)
+		return
+	}
+	params := templateJson.JsonGroups[0].Params
 	content, err := self.TemplatesPool.Render(path, params)
 	if err != nil {
 		fmt.Fprint(w, err)
@@ -42,7 +48,7 @@ func (self *AhcServer) IndexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func StartServer(options map[string]string) {
-	server := &AhcServer{}
+	server := &AhcServer{FsParser: &parse.Fs{}}
 	server.Dev = (options["dev"] == "true")
 	server.ReadComponents()
 	port := options["port"]
