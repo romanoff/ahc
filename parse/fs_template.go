@@ -1,8 +1,11 @@
 package parse
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/romanoff/ahc/server"
 	"github.com/romanoff/ahc/view"
 	"io/ioutil"
 	"os"
@@ -50,4 +53,71 @@ func (self *Fs) ParseTemplate(templatepath string, basepath string) (*view.Templ
 		Path:    strings.TrimPrefix(strings.TrimPrefix(absFilepath, absBasepath), "/"),
 	}
 	return template, nil
+}
+
+func (self *Fs) ParseTemplateJson(jsonpath string) (*server.TemplateJson, error) {
+	if _, err := os.Stat(jsonpath); err != nil {
+		return nil, errors.New(fmt.Sprintf("Error whie parsing json params for template: %v file doesn't exist", jsonpath))
+	}
+	content, err := ioutil.ReadFile(jsonpath)
+	if err != nil {
+		return nil, err
+	}
+	lines := bytes.Split(content, []byte("\n"))
+	name := []byte{}
+	jsonContent := []byte{}
+	nameParsing := true
+	templateJson := &server.TemplateJson{JsonGroups: make([]*server.JsonGroup, 0, 0)}
+	for _, line := range lines {
+		delimiterLine := false
+		if len(strings.TrimSpace(string(line))) == 0 {
+			delimiterLine = true
+		}
+		if len(strings.TrimRight(strings.TrimSpace(string(line)), "-")) == 0 {
+			delimiterLine = true
+		}
+		if delimiterLine {
+			if nameParsing == false {
+				jsonGroup, err := self.createJsonGroup(name, jsonContent)
+				if err != nil {
+					return nil, errors.New(fmt.Sprintf("%v : %v", err, jsonpath))
+				}
+				templateJson.JsonGroups = append(templateJson.JsonGroups, jsonGroup)
+				name = []byte{}
+				jsonContent = []byte{}
+				nameParsing = true
+			} else {
+				nameParsing = false
+			}
+			continue
+		}
+		if nameParsing {
+			if len(name) != 0 {
+				name = append(name, []byte("\n")...)
+			}
+			name = append(name, line...)
+		} else {
+			jsonContent = append(jsonContent, []byte(" ")...)
+			jsonContent = append(jsonContent, line...)
+		}
+	}
+	return templateJson, nil
+}
+
+func (self *Fs) createJsonGroup(name, jsonContent []byte) (*server.JsonGroup, error) {
+	//TODO: Recover from invalid json parsing
+	if len(strings.TrimSpace(string(name))) == 0 {
+		return nil, errors.New("json group name is missing")
+	}
+	if len(strings.TrimSpace(string(jsonContent))) == 0 {
+		return nil, errors.New("json group json is missing")
+	}
+	jsonGroup := &server.JsonGroup{Name: string(name)}
+	params := make(map[string]interface{})
+	err := json.Unmarshal(jsonContent, &params)
+	if err != nil {
+		return nil, err
+	}
+	jsonGroup.Params = params
+	return jsonGroup, nil
 }
