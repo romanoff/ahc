@@ -41,7 +41,6 @@ func (self *ComponentSearch) Search(path string) error {
 	if err != nil {
 		return err
 	}
-	//TODO: check partial components as well as internal components of components
 	return nil
 }
 
@@ -131,6 +130,9 @@ func (self *ComponentSearch) GetUsedTemplates(content []byte) []string {
 }
 
 func (self *ComponentSearch) AddComponents(namespaces []string) error {
+	if len(namespaces) == 0 {
+		return nil
+	}
 	if self.TemplatesPool == nil {
 		return errors.New("Templates pool is missing")
 	}
@@ -142,6 +144,29 @@ func (self *ComponentSearch) AddComponents(namespaces []string) error {
 		if self.UsedNamespaces[component.Namespace] == false {
 			self.UsedNamespaces[component.Namespace] = true
 			self.Components = append(self.Components, component)
+		}
+	}
+	size := len(self.Components)
+	for {
+		size = len(self.Components)
+		for i := 0; i < size; i++ {
+			namespaces, err := self.GetUsedNamespaces([]byte(self.Components[i].Template.Content))
+			if err != nil {
+				return err
+			}
+			for _, namespace := range namespaces {
+				component := self.TemplatesPool.ComponentsPool.GetComponent(namespace)
+				if component == nil {
+					return errors.New(fmt.Sprintf("Component not found: %v", namespace))
+				}
+				if self.UsedNamespaces[component.Namespace] == false {
+					self.UsedNamespaces[component.Namespace] = true
+					self.Components = append(self.Components, component)
+				}
+			}
+		}
+		if size == len(self.Components) {
+			break
 		}
 	}
 	return nil
