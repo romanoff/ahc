@@ -8,6 +8,14 @@ import (
 	"strings"
 )
 
+func InitComponentSearch(templatesPool *view.Pool) *ComponentSearch {
+	return &ComponentSearch{
+		Components:     make([]*component.Component, 0, 0),
+		UsedNamespaces: make(map[string]bool),
+		TemplatesPool:  templatesPool,
+	}
+}
+
 type ComponentSearch struct {
 	Components     []*component.Component
 	UsedNamespaces map[string]bool
