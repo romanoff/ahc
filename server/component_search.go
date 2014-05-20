@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/romanoff/ahc/component"
 	"github.com/romanoff/ahc/view"
+	"regexp"
 	"strings"
 )
 
@@ -12,12 +13,14 @@ func InitComponentSearch(templatesPool *view.Pool) *ComponentSearch {
 	return &ComponentSearch{
 		Components:     make([]*component.Component, 0, 0),
 		UsedNamespaces: make(map[string]bool),
+		UsedTemplates:  make(map[string]bool),
 		TemplatesPool:  templatesPool,
 	}
 }
 
 type ComponentSearch struct {
 	Components     []*component.Component
+	UsedTemplates  map[string]bool
 	UsedNamespaces map[string]bool
 	TemplatesPool  *view.Pool
 }
@@ -89,7 +92,42 @@ func (self *ComponentSearch) GetUsedNamespaces(content []byte) ([]string, error)
 			}
 		}
 	}
+	templates := self.GetUsedTemplates(content)
+	for _, path := range templates {
+		template := self.TemplatesPool.GetTemplate(path)
+		if template == nil {
+			return nil, errors.New(fmt.Sprintf("Template %v was not found", path))
+		}
+		namespaces, err := self.GetUsedNamespaces([]byte(template.Content))
+		if err != nil {
+			return nil, err
+		}
+		for _, namespace := range namespaces {
+			if !usedMap[namespace] {
+				usedNamespaces = append(usedNamespaces, namespace)
+				usedMap[namespace] = true
+			}
+		}
+	}
 	return usedNamespaces, nil
+}
+
+var partialRe *regexp.Regexp = regexp.MustCompile("{{\\s*template\\s+\"([\\w|/]+)\"[\\s|\\.]*}}")
+
+func (self *ComponentSearch) GetUsedTemplates(content []byte) []string {
+	allMatches := partialRe.FindAllSubmatch(content, -1)
+	usedTemplates := []string{}
+	for _, matches := range allMatches {
+		if len(matches) == 2 {
+			templateName := string(matches[1])
+			if self.UsedTemplates[templateName] {
+				continue
+			}
+			usedTemplates = append(usedTemplates, templateName)
+			self.UsedTemplates[templateName] = true
+		}
+	}
+	return usedTemplates
 }
 
 func (self *ComponentSearch) AddComponents(namespaces []string) error {
