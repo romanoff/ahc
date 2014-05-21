@@ -6,17 +6,20 @@ import (
 	"github.com/foize/go.sgr"
 	"github.com/romanoff/ahc/component"
 	"github.com/romanoff/ahc/parse"
+	"github.com/romanoff/ahc/server"
 	"github.com/romanoff/ahc/view"
 	"github.com/romanoff/htmlcompressor"
 	"net/http"
+	"regexp"
 	"strings"
 )
 
 type AhcServer struct {
-	TemplatesPool  *view.Pool
-	Dev            bool
-	FsParser       *parse.Fs
-	HtmlCompressor *htmlcompressor.HtmlCompressor
+	TemplatesPool   *view.Pool
+	TemplatesStyles map[string][]byte
+	Dev             bool
+	FsParser        *parse.Fs
+	HtmlCompressor  *htmlcompressor.HtmlCompressor
 }
 
 func (self *AhcServer) ReadComponents() {
@@ -26,6 +29,7 @@ func (self *AhcServer) ReadComponents() {
 	fsParser.ParseIntoPool(componentsPool, "components")
 	fsParser.ParseIntoTemplatePool(self.TemplatesPool, "templates")
 	self.TemplatesPool.ComponentsPool = componentsPool
+	self.TemplatesStyles = make(map[string][]byte)
 }
 
 func (self *AhcServer) ViewHandler(w http.ResponseWriter, r *http.Request) {
@@ -68,6 +72,37 @@ func (self *AhcServer) TemplateHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(self.HtmlCompressor.Compress(content))
 }
 
+var stylePathRe *regexp.Regexp = regexp.MustCompile("/s/([\\w|/]+)")
+
+func (self *AhcServer) StyleHandler(w http.ResponseWriter, r *http.Request) {
+	match := stylePathRe.FindStringSubmatch(r.URL.Path)
+	if len(match) != 2 {
+		fmt.Fprint(w, "Wrong style path format")
+		return
+	}
+	path := match[1]
+	fmt.Print(sgr.MustParseln(fmt.Sprintf("Rendering css for [fg-green]%v[reset]", path)))
+	if self.TemplatesStyles[path] {
+		w.Write(self.TemplatesStyles[path])
+		return
+	}
+	content, err := self.getStyleFor(path)
+	if err != nil {
+		fmt.Fprint(w, err)
+	}
+	self.TemplatesStyles[path] = content
+	w.Write(content)
+}
+
+func (self *AhcServer) getStyleFor(path string) ([]byte, error) {
+	componentsSearch := server.InitComponentSearch(self.TemplatesPool)
+	err := componentsSearch.Search(path)
+	if err != nil {
+		return nil, err
+	}
+	return server.GetComponentsCss(self.TemplatesPool.ComponentsPool, componentsSearch.Components)
+}
+
 func (self *AhcServer) IndexHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "List of all components and views should be shown here")
 }
@@ -83,5 +118,6 @@ func StartServer(options map[string]string) {
 	http.HandleFunc("/", server.IndexHandler)
 	http.HandleFunc("/v/", server.ViewHandler)
 	http.HandleFunc("/t/", server.TemplateHandler)
+	http.HandleFunc("/s/", server.StyleHandler)
 	http.ListenAndServe(":"+port, nil)
 }
