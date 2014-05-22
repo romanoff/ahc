@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/sha1"
 	"encoding/json"
 	"fmt"
 	"github.com/foize/go.sgr"
@@ -33,6 +34,7 @@ func (self *AhcServer) ReadComponents() {
 }
 
 func (self *AhcServer) ViewHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if self.Dev {
 		self.ReadComponents()
 	}
@@ -43,6 +45,11 @@ func (self *AhcServer) ViewHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	params := templateJson.JsonGroups[0].Params
+	err = self.AddStylesheets(params, path)
+	if err != nil {
+		fmt.Fprint(w, err)
+		return
+	}
 	content, err := self.TemplatesPool.Render(path, params)
 	if err != nil {
 		fmt.Fprint(w, err)
@@ -52,6 +59,7 @@ func (self *AhcServer) ViewHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (self *AhcServer) TemplateHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if self.Dev {
 		self.ReadComponents()
 	}
@@ -60,6 +68,12 @@ func (self *AhcServer) TemplateHandler(w http.ResponseWriter, r *http.Request) {
 	jsonParam := r.FormValue("params")
 	params := make(map[string]interface{})
 	err := json.Unmarshal([]byte(jsonParam), &params)
+
+	err = self.AddStylesheets(params, path)
+	if err != nil {
+		fmt.Fprint(w, err)
+		return
+	}
 	if err != nil {
 		fmt.Fprintf(w, "Json unmarshaling error: %v", err)
 		return
@@ -72,9 +86,22 @@ func (self *AhcServer) TemplateHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(self.HtmlCompressor.Compress(content))
 }
 
+func (self *AhcServer) AddStylesheets(params map[string]interface{}, path string) error {
+	content, err := self.getStyleFor(path)
+	if err != nil {
+		return err
+	}
+	h := sha1.New()
+	h.Write(content)
+	hash := fmt.Sprintf("%x", h.Sum(nil))
+	params["stylesheets"] = []string{"/s/" + path + "-" + hash + ".css"}
+	return nil
+}
+
 var stylePathRe *regexp.Regexp = regexp.MustCompile("/s/([\\w|/]+)")
 
 func (self *AhcServer) StyleHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/css; charset=utf-8")
 	match := stylePathRe.FindStringSubmatch(r.URL.Path)
 	if len(match) != 2 {
 		fmt.Fprint(w, "Wrong style path format")
@@ -82,13 +109,14 @@ func (self *AhcServer) StyleHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	path := match[1]
 	fmt.Print(sgr.MustParseln(fmt.Sprintf("Rendering css for [fg-green]%v[reset]", path)))
-	if self.TemplatesStyles[path] {
+	if self.TemplatesStyles[path] != nil {
 		w.Write(self.TemplatesStyles[path])
 		return
 	}
 	content, err := self.getStyleFor(path)
 	if err != nil {
 		fmt.Fprint(w, err)
+		return
 	}
 	self.TemplatesStyles[path] = content
 	w.Write(content)
