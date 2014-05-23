@@ -128,7 +128,20 @@ func (self *AhcServer) getStyleFor(path string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return server.GetComponentsCss(self.TemplatesPool.ComponentsPool, componentsSearch.Components)
+	content, err := server.GetComponentsCss(self.TemplatesPool.ComponentsPool, componentsSearch.Components)
+	if err != nil {
+		return nil, err
+	}
+	customCss, err := self.GetTemplateCustomCss(path)
+	if err != nil {
+		return nil, err
+	}
+	content = append(content, customCss...)
+	return content, nil
+}
+
+func (self *AhcServer) GetTemplateCustomCss(path string) ([]byte, error) {
+	return []byte{}, nil
 }
 
 func (self *AhcServer) IndexHandler(w http.ResponseWriter, r *http.Request) {
