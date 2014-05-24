@@ -121,3 +121,11 @@ func (self *Fs) createJsonGroup(name, jsonContent []byte) (*server.JsonGroup, er
 	jsonGroup.Params = params
 	return jsonGroup, nil
 }
+
+func (self *Fs) GetTemplateCustomCss(path string) ([]byte, error) {
+	cssPath := "templates/" + path + ".css"
+	if _, err := os.Stat(cssPath); err != nil {
+		return []byte{}, nil
+	}
+	return ioutil.ReadFile(cssPath)
+}

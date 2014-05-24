@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/sha1"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/foize/go.sgr"
 	"github.com/romanoff/ahc/component"
@@ -128,20 +129,25 @@ func (self *AhcServer) getStyleFor(path string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	content, err := server.GetComponentsCss(self.TemplatesPool.ComponentsPool, componentsSearch.Components)
+	cssContent := []byte{}
+	usedTemplates := []string{path}
+	for path, _ := range componentsSearch.UsedTemplates {
+		usedTemplates = append(usedTemplates, path)
+	}
+	for _, path := range usedTemplates {
+		templateCss, err := self.FsParser.GetTemplateCustomCss(path)
+		if err != nil {
+			return nil, errors.New(fmt.Sprintf("Error while reading template css: %v", err))
+		}
+		cssContent = append(cssContent, templateCss...)
+		cssContent = append(cssContent, []byte("\n")...)
+	}
+	componentsCss, err := server.GetComponentsCss(self.TemplatesPool.ComponentsPool, componentsSearch.Components)
 	if err != nil {
 		return nil, err
 	}
-	customCss, err := self.GetTemplateCustomCss(path)
-	if err != nil {
-		return nil, err
-	}
-	content = append(content, customCss...)
-	return content, nil
-}
-
-func (self *AhcServer) GetTemplateCustomCss(path string) ([]byte, error) {
-	return []byte{}, nil
+	cssContent = append(cssContent, componentsCss...)
+	return cssContent, nil
 }
 
 func (self *AhcServer) IndexHandler(w http.ResponseWriter, r *http.Request) {
