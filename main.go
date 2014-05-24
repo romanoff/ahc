@@ -13,5 +13,6 @@ func main() {
 		&gofh.Option{Name: "dev", Boolean: true},
 	}
 	flagHandler.HandleCommandWithOptions("server", serverOptions, StartServer)
+	flagHandler.HandleCommand("test", TestComponents)
 	flagHandler.Parse(os.Args[1:])
 }
