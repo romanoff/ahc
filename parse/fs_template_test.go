@@ -1,8 +1,6 @@
 package parse
 
 import (
-	"fmt"
-	"github.com/kr/pretty"
 	"testing"
 )
 
@@ -27,7 +25,6 @@ func TestParseTemplateJson(t *testing.T) {
 		t.Errorf("Expected to get no error while parsing index template json, but got: '%v'", err)
 	}
 	expected := 2
-	fmt.Printf("%# v", pretty.Formatter(templateJson.JsonGroups))
 	if len(templateJson.JsonGroups) != expected {
 		t.Errorf("Expected to get:\n%v\n, but got:\n%v", expected, len(templateJson.JsonGroups))
 	}
