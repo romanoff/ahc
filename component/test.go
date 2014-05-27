@@ -8,11 +8,35 @@ import (
 	"github.com/romanoff/htmlcompressor"
 )
 
+type TestPool struct {
+	TestSuites []*TestSuite
+}
+
+func (self *TestPool) Run(stopOnFailure bool) error {
+	for _, testSuite := range self.TestSuites {
+		err := testSuite.Run(stopOnFailure)
+		if err != nil && stopOnFailure {
+			return err
+		}
+	}
+	return nil
+}
+
 type TestSuite struct {
 	Compressor *htmlcompressor.HtmlCompressor
 	Pool       *Pool
 	Component  *Component
 	Tests      []*Test
+}
+
+func (self *TestSuite) Run(stopOnFailure bool) error {
+	for _, test := range self.Tests {
+		err := test.Run(self.Component, self.Pool, self.Compressor)
+		if err != nil && stopOnFailure {
+			return err
+		}
+	}
+	return nil
 }
 
 type Test struct {
