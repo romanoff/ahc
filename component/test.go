@@ -48,7 +48,11 @@ type Test struct {
 func (self *Test) Run(component *Component, pool *Pool, compressor *htmlcompressor.HtmlCompressor) error {
 	html, err := component.Render(self.Params, pool)
 	if err != nil {
-		return errors.New(fmt.Sprintf("Error while rendering component %v : %v", component.Namespace, err))
+		errorContent := fmt.Sprintf("Error while rendering component %v : %v", component.Namespace, err)
+		if self.Identifier != ""{
+			fmt.Println(errorContent)
+		}
+		return errors.New(errorContent)
 	}
 	diffError := htmldiff.Compare(self.FormatHtml(html, compressor),
 		self.FormatHtml(self.Expected, compressor))
