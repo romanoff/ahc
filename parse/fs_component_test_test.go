@@ -1,12 +1,15 @@
 package parse
 
 import (
+	"github.com/romanoff/ahc/component"
 	"testing"
 )
 
 func TestParseComponentTest(t *testing.T) {
 	fs := &Fs{}
-	testSuite, err := fs.ParseComponentTest("test_files/button/button.test")
+	pool := &component.Pool{}
+	fs.ParseIntoPool(pool, "test_files")
+	testSuite, err := fs.ParseComponentTest("test_files/button/button.test", pool)
 	if err != nil {
 		t.Errorf("Didn't expect error while parsing component test, but got %v", err)
 	}
