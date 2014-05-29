@@ -1,0 +1,13 @@
+<html namespace="ahc.menu-item" default_param="content">
+  <style>
+    .ahc_menu_item {
+    color: red;
+    }
+  </style>
+  <template>
+    <div class="ahc_menu_item">{{.content|html}}</div>
+  </template>
+  <schema>
+    content {string} menu item content
+  </schema>
+</html>
