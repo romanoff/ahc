@@ -8,9 +8,13 @@ import (
 )
 
 func TestComponents(options map[string]string) {
+	folder := "."
+	if fi, err := os.Stat("components"); err == nil && fi.IsDir() {
+		folder = "components"
+	}
 	testPool := &component.TestPool{}
 	fs := &parse.Fs{}
-	err := fs.ParseIntoTestPool(testPool, "components")
+	err := fs.ParseIntoTestPool(testPool, folder)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
