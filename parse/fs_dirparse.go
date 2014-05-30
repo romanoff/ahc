@@ -1,16 +1,16 @@
 package parse
 
 import (
-	"github.com/romanoff/ahc/component"
-	"github.com/romanoff/ahc/view"
-	"github.com/romanoff/htmlcompressor"
-	"os"
-	"path/filepath"
 	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/romanoff/ahc/component"
+	"github.com/romanoff/ahc/view"
+	"github.com/romanoff/htmlcompressor"
 	"io/ioutil"
+	"os"
+	"path/filepath"
 )
 
 const (

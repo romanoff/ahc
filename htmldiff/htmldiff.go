@@ -5,6 +5,7 @@ import (
 	"code.google.com/p/go-html-transform/h5"
 	"code.google.com/p/go.net/html"
 	"fmt"
+	"github.com/foize/go.sgr"
 )
 
 type Error struct {
@@ -87,9 +88,11 @@ func PrettyPrint(err *Error) {
 	if err == nil {
 		return
 	}
-	fmt.Println(err.Description)
-	fmt.Println("Expected:")
-	fmt.Printf("-->%s<--\n", err.Expected)
-	fmt.Println("Got:")
-	fmt.Printf("-->%s<--\n", err.Got)
+	fmt.Println(sgr.MustParse("[fg-11]" + err.Description + "[reset]"))
+	fmt.Println(sgr.MustParse("[fg-green]Expected:[reset]"))
+	expected := fmt.Sprintf("-->%s<--\n", err.Expected)
+	fmt.Printf(sgr.MustParse("[fg-green]" + expected + "[reset]"))
+	fmt.Println(sgr.MustParse("[fg-red]Got:[reset]"))
+	got := fmt.Sprintf("-->%s<--\n", err.Got)
+	fmt.Printf(sgr.MustParse("[fg-red]" + got + "[reset]"))
 }

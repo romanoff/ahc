@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/romanoff/ahc/htmldiff"
 	"github.com/romanoff/htmlcompressor"
+	"github.com/foize/go.sgr"
 )
 
 type TestPool struct {
@@ -48,21 +49,25 @@ type Test struct {
 func (self *Test) Run(component *Component, pool *Pool, compressor *htmlcompressor.HtmlCompressor) error {
 	html, err := component.Render(self.Params, pool)
 	if err != nil {
-		errorContent := fmt.Sprintf("Error while rendering component %v : %v", component.Namespace, err)
+		fmt.Printf(sgr.MustParse("[fg-red].[reset]"))
+		errorContent := fmt.Sprintf("Error while rendering component %v : %v\n", component.Namespace, err)
 		if self.Identifier != ""{
-			fmt.Println(errorContent)
+			fmt.Printf(sgr.MustParse("[fg-red]" +errorContent+"[reset]"))
 		}
 		return errors.New(errorContent)
 	}
 	diffError := htmldiff.Compare(self.FormatHtml(html, compressor),
 		self.FormatHtml(self.Expected, compressor))
 	if diffError != nil {
+		fmt.Printf(sgr.MustParse("[fg-red].[reset]"))
 		if self.Identifier != "" {
-			fmt.Printf("%v test failed:\n", self.Identifier)
+			errorContent := fmt.Sprintf("%v test failed:\n", self.Identifier)
+			fmt.Printf(sgr.MustParse("[fg-red]" +errorContent+"[reset]"))
 			htmldiff.PrettyPrint(diffError)
 		}
 		return errors.New("Test failed")
 	}
+	fmt.Printf(sgr.MustParse("[fg-green].[reset]"))
 	return nil
 }
 
