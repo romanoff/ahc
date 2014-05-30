@@ -24,7 +24,7 @@ func (self *Fs) ParseSchema(content []byte, filepath string) (*schema.Schema, er
 			} else {
 				parentField := levelFields[level-1]
 				if parentField == nil {
-					return nil, errors.New(fmt.Sprintf("No parent field for the following line: '%v' in following file: '%v'", line, filepath))
+					return nil, errors.New(fmt.Sprintf("No parent field for the following line: '%s' in following file: '%v'", line, filepath))
 				}
 				if parentField.Type == schema.ArrayField {
 					parentField.ArrayValues = append(parentField.ArrayValues, field)

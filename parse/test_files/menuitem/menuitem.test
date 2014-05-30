@@ -1,0 +1,4 @@
+Input:
+{"content": "menu item content"}
+Expected:
+<div class="ahc_menu_item">menu item content</div>

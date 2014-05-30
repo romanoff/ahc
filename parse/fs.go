@@ -3,6 +3,7 @@ package parse
 import (
 	"errors"
 	"fmt"
+	"github.com/jteeuwen/go-pkg-xmlx"
 	"github.com/romanoff/ahc/component"
 	"io/ioutil"
 	"os"
@@ -43,6 +44,10 @@ func (self *Fs) readAll(component *component.Component, basePath string) error {
 		return err
 	}
 	err = self.readSchema(component, basePath)
+	if err != nil {
+		return err
+	}
+	err = self.readHtml(component, basePath)
 	if err != nil {
 		return err
 	}
@@ -109,4 +114,62 @@ func (self *Fs) readSchema(c *component.Component, basePath string) error {
 	}
 	c.Schema = schema
 	return nil
+}
+
+func (self *Fs) readHtml(c *component.Component, basePath string) error {
+	filepath := basePath + ".html"
+	if _, err := os.Stat(filepath); err != nil {
+		return nil
+	}
+	content, err := ioutil.ReadFile(filepath)
+	document := xmlx.New()
+	document.LoadBytes(content, nil)
+	html := document.Root.Children[0]
+	for _, attr := range html.Attributes {
+		if attr.Name.Local == "namespace" {
+			c.Namespace = attr.Value
+		}
+		if attr.Name.Local == "default_param" {
+			c.DefaultParam = attr.Value
+		}
+		if attr.Name.Local == "require" {
+			c.Requires = []string{attr.Value}
+		}
+	}
+	for _, node := range html.Children {
+		if node.Type != xmlx.NT_ELEMENT {
+			continue
+		}
+		if node.Name.Local == "style" {
+			c.Css = getXmlNodesContent(node.Children)
+		}
+		if node.Name.Local == "schema" {
+			content := getXmlNodesContent(node.Children)
+			lines := strings.Split(content, "\n")
+			schemaContent := []byte{}
+			for _, line := range lines {
+				schemaContent = append(schemaContent, []byte(strings.Replace(line, "    ", "", 1))...)
+			}
+			schema, err := self.ParseSchema(schemaContent, filepath)
+			if err != nil {
+				return err
+			}
+			c.Schema = schema
+		}
+		if node.Name.Local == "template" {
+			c.Template = &component.Template{Content: getXmlNodesContent(node.Children)}
+		}
+	}
+	if err != nil {
+		return errors.New(fmt.Sprintf("Error while reading html file: %v", filepath))
+	}
+	return nil
+}
+
+func getXmlNodesContent(nodes []*xmlx.Node) string {
+	content := ""
+	for _, node := range nodes {
+		content += strings.TrimSpace(node.String())
+	}
+	return content
 }

@@ -95,7 +95,7 @@ func getTest(input, expected []byte) (*component.Test, error) {
 
 func (self *Fs) ParseIntoPool(pool *component.Pool, dirpath string) error {
 	filepath.Walk(dirpath, func(path string, f os.FileInfo, err error) error {
-		if !f.IsDir() && filepath.Ext(f.Name()) == ".css" {
+		if !f.IsDir() && (filepath.Ext(f.Name()) == ".css" || filepath.Ext(f.Name()) == ".html") {
 			component, err := self.ParseComponent(path)
 			if err != nil {
 				return err
@@ -134,16 +134,15 @@ func (self *Fs) ParseIntoTestPool(testPool *component.TestPool, dirpath string) 
 		return err
 	}
 	htmlcompressor := htmlcompressor.InitAll()
-	filepath.Walk(dirpath, func(path string, f os.FileInfo, err error) error {
+	return filepath.Walk(dirpath, func(path string, f os.FileInfo, err error) error {
 		if !f.IsDir() && filepath.Ext(f.Name()) == ".test" {
 			testSuite, err := self.ParseComponentTest(path, pool)
-			testSuite.Compressor = htmlcompressor
 			if err != nil {
 				return err
 			}
+			testSuite.Compressor = htmlcompressor
 			testPool.TestSuites = append(testPool.TestSuites, testSuite)
 		}
 		return nil
 	})
-	return nil
 }

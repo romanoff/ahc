@@ -10,7 +10,7 @@ func TestParseIntoPool(t *testing.T) {
 	fs := &Fs{}
 	pool := &component.Pool{}
 	fs.ParseIntoPool(pool, "test_files")
-	if len(pool.Components) != 1 {
+	if len(pool.Components) == 0 {
 		t.Error("Failed to parse button component from test_files folder into pool")
 	}
 }

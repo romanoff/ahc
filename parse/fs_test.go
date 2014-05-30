@@ -13,7 +13,7 @@ func TestNonExistingFileParse(t *testing.T) {
 	}
 }
 
-func TestReadCss(t *testing.T) {
+func TestParseComponent(t *testing.T) {
 	fs := &Fs{}
 	component, err := fs.ParseComponent("test_files/button/button.css")
 	if err != nil {
@@ -36,5 +36,28 @@ func TestReadCss(t *testing.T) {
 	}
 	if component.Schema == nil || len(component.Schema.Fields) != 5 {
 		t.Errorf("Expected to get schema with 5 fields, but got %# v", pretty.Formatter(component.Schema))
+	}
+}
+
+func TestParseHtmlComponent(t *testing.T) {
+	fs := &Fs{}
+	component, err := fs.ParseComponent("test_files/menuitem/menuitem.html")
+	if err != nil {
+		t.Errorf("Expected not to get error while parsing menuitem component, but got %v", err)
+	}
+	if component.Css == "" {
+		t.Errorf("Expected component css to not be empty after parsing menuitem css")
+	}
+	if component.Namespace != "ahc.menu-item" {
+		t.Errorf("Expected menuitem component namespace to be ahc.menu-item, but got '%v'", component.Namespace)
+	}
+	if component.DefaultParam != "content" {
+		t.Errorf("Expected menuitem component default param to content name, but got '%v'", component.DefaultParam)
+	}
+	if component.Template == nil {
+		t.Error("Expected to get menuitem template, but got nil")
+	}
+	if component.Schema == nil || len(component.Schema.Fields) != 1 {
+		t.Errorf("Expected to get schema with 1 fields, but got %# v", pretty.Formatter(component.Schema))
 	}
 }
