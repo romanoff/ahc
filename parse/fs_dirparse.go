@@ -45,8 +45,8 @@ func (self *Fs) ParseComponentTest(filepath string, pool *component.Pool) (*comp
 	n := 0
 	mode := INPUT
 	for _, line := range lines {
-		line := bytes.TrimSpace(line)
-		if string(line) == "Input:" {
+		// line := bytes.TrimSpace(line)
+		if string(bytes.TrimSpace(line)) == "Input:" {
 			if len(input) != 0 && len(expected) != 0 {
 				n++
 				test, err := getTest(input, expected)
@@ -61,7 +61,7 @@ func (self *Fs) ParseComponentTest(filepath string, pool *component.Pool) (*comp
 			mode = INPUT
 			continue
 		}
-		if string(line) == "Expected:" {
+		if string(bytes.TrimSpace(line)) == "Expected:" {
 			mode = EXPECTED
 			continue
 		}
@@ -70,6 +70,7 @@ func (self *Fs) ParseComponentTest(filepath string, pool *component.Pool) (*comp
 		}
 		if mode == EXPECTED {
 			expected = append(expected, line...)
+			expected = append(expected, []byte("\n")...)
 		}
 	}
 	if len(input) != 0 && len(expected) != 0 {

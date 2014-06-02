@@ -1,14 +1,10 @@
 Input:
-{"name": "Button"}
+{"type": "action", "name": "Button"}
 Expected:
-<div class="svs_button">Button</div>
+<div class="ahc_button ahc_button_action ">Button</div>
 
 Input:
-{"name": "Button", "url": "#"}
+{"type": "action", "name": "Button"}
 Expected:
-<a class="svs_button" href="#">Button</a>
+<div class="ahc_button ahc_button_action ">Button</div>
 
-Input:
-{"name": "Button", "url": "#", "type": "action"}
-Expected:
-<a class="svs_button svs_button_action" href="#">Button</a>

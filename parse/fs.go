@@ -171,5 +171,6 @@ func getXmlNodesContent(nodes []*xmlx.Node) string {
 	for _, node := range nodes {
 		content += strings.TrimSpace(node.String())
 	}
-	return content
+
+	return strings.Replace(content, "&#xA;", "\n", -1)
 }
