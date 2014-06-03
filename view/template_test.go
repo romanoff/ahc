@@ -24,7 +24,7 @@ func TestTemplateRender(t *testing.T) {
 	if err != nil {
 		t.Errorf("Not expected to get an error while rendering template, but got %v", err)
 	}
-	expected := `<div class="container"><div class="button">A</div><div class="button">B</div><div class="button">C</div></div>`
+	expected := `<!doctype html><div class="container"><div class="button">A</div><div class="button">B</div><div class="button">C</div></div>`
 	if expected != string(content) {
 		t.Errorf("Expected to get:\n%v\n, but got:\n%v", expected, string(content))
 	}

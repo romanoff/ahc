@@ -52,7 +52,12 @@ func (self *Template) render(params map[string]interface{}, pool *component.Pool
 	if err != nil {
 		return nil, err
 	}
-	return view.GetContent(&RenderParams{Pool: pool, Safe: safe})
+	content, err := view.GetContent(&RenderParams{Pool: pool, Safe: safe})
+	if err != nil {
+		return nil, err
+	}
+	content = append([]byte("<!doctype html>"), content...)
+	return content, nil
 }
 
 func (self *Template) Render(params map[string]interface{}, pool *component.Pool) ([]byte, error) {
