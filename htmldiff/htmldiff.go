@@ -6,6 +6,7 @@ import (
 	"code.google.com/p/go.net/html"
 	"fmt"
 	"github.com/foize/go.sgr"
+	"strings"
 )
 
 type Error struct {
@@ -35,6 +36,13 @@ func CompareNode(originalNode, expectedNode *html.Node) *Error {
 				attrFound = true
 				if originalAttr.Val == attr.Val {
 					attrValueSame = true
+				} else {
+					if attr.Key == "class" {
+						attrValueSame = equalWithSeparator(originalAttr.Val, attr.Val, " ")
+					}
+					if attr.Key == "style" {
+						attrValueSame = equalWithSeparator(originalAttr.Val, attr.Val, ";")
+					}
 				}
 			}
 		}
@@ -95,4 +103,38 @@ func PrettyPrint(err *Error) {
 	fmt.Println(sgr.MustParse("[fg-red]Got:[reset]"))
 	got := fmt.Sprintf("-->%s<--\n", err.Got)
 	fmt.Printf(sgr.MustParse("[fg-red]" + got + "[reset]"))
+}
+
+func equalWithSeparator(original, expected, separator string) bool {
+	values := strings.Split(original, separator)
+	originalValues := []string{}
+	for _, value := range values {
+		if strings.TrimSpace(value) == "" {
+			continue
+		}
+		originalValues = append(originalValues, strings.TrimSpace(value))
+	}
+	values = strings.Split(expected, separator)
+	expectedValues := []string{}
+	for _, value := range values {
+		expectedValues = append(expectedValues, strings.TrimSpace(value))
+	}
+	if len(originalValues) != len(expectedValues) {
+		return false
+	}
+	usedIndexes := make(map[int]bool)
+	for _, value := range originalValues {
+		valueFound := false
+		for j, expectedValue := range expectedValues {
+			if !usedIndexes[j] && expectedValue == value {
+				valueFound = true
+				usedIndexes[j] = true
+				break
+			}
+		}
+		if !valueFound {
+			return false
+		}
+	}
+	return true
 }

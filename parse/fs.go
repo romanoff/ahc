@@ -94,7 +94,7 @@ func (self *Fs) readTemplate(c *component.Component, basePath string) error {
 	if err != nil {
 		return errors.New(fmt.Sprintf("Error while reading tmpl file: %v", filepath))
 	}
-	template := &component.Template{Content: string(content)}
+	template := &component.Template{Content: stripClasses(string(content))}
 	c.Template = template
 	return nil
 }
@@ -157,7 +157,7 @@ func (self *Fs) readHtml(c *component.Component, basePath string) error {
 			c.Schema = schema
 		}
 		if node.Name.Local == "template" {
-			c.Template = &component.Template{Content: getXmlNodesContent(node.Children)}
+			c.Template = &component.Template{Content: stripClasses(getXmlNodesContent(node.Children))}
 		}
 	}
 	if err != nil {
@@ -173,4 +173,17 @@ func getXmlNodesContent(nodes []*xmlx.Node) string {
 	}
 
 	return strings.Replace(content, "&#xA;", "\n", -1)
+}
+
+// Removes {css class_name} from templates and replaces it with
+// class names. In future this code can be removed and class names
+// minimized.
+var cssClassRe *regexp.Regexp = regexp.MustCompile("\\{\\s*css\\s*([\\w-]+)\\s*\\}")
+
+func stripClasses(content string) string {
+	matches := cssClassRe.FindAllStringSubmatch(content, -1)
+	for _, match := range matches {
+		content = strings.Replace(content, match[0], match[1], -1)
+	}
+	return content
 }
