@@ -83,6 +83,9 @@ func getAhcNodeParams(node *xmlx.Node) (map[string][]Tag, []Tag, error) {
 
 func nodesHaveNamespace(nodes []*xmlx.Node, namespace string) bool {
 	for _, node := range nodes {
+		if node.Type != xmlx.NT_ELEMENT {
+			continue
+		}
 		if node.Name.Space != namespace {
 			return false
 		}
